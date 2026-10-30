@@ -16,7 +16,8 @@ async function checkDirectory(dir) {
     }
   }
 }
-for (const dir of ['src', 'scripts', 'tests', 'cep']) await checkDirectory(path.join(ROOT, dir));
+for (const dir of ['bin', 'src', 'scripts', 'tests', 'cep'])
+  await checkDirectory(path.join(ROOT, dir));
 let count = 0;
 for (const [app, tools] of Object.entries(catalogs)) {
   const names = new Set();

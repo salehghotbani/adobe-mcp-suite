@@ -1,10 +1,11 @@
-import { copyFile, mkdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, writeFile } from 'node:fs/promises';
 import { randomBytes } from 'node:crypto';
 import path from 'node:path';
 import { APPS } from '../config/applications.mjs';
 import { ROOT } from '../config/paths.mjs';
 import { VERSION } from '../config/project.mjs';
 import { readConfiguration, validateConnection } from '../config/settings.mjs';
+import { writePanel } from './panels.mjs';
 
 export async function prepareProject({ root = ROOT, nodePath = process.execPath } = {}) {
   const configPath = path.join(root, '.adobe-mcp', 'config.json');
@@ -18,31 +19,19 @@ export async function prepareProject({ root = ROOT, nodePath = process.execPath 
       )
     ])
   );
-  const template = await readFile(path.join(root, 'cep', 'manifest.xml.template'), 'utf8');
   await mkdir(path.dirname(configPath), { recursive: true });
   // Persist tokens before generating panels so a failed copy cannot discard them.
   await writeFile(configPath, JSON.stringify(config, null, 2) + '\n', { mode: 0o600 });
 
-  for (const [app, info] of Object.entries(APPS)) {
+  for (const app of Object.keys(APPS)) {
     const panel = path.join(root, 'build', 'cep', `com.adobemcp.${app}`);
-    await mkdir(path.join(panel, 'CSXS'), { recursive: true });
-    for (const file of ['index.html', 'panel.css', 'panel.js'])
-      await copyFile(path.join(root, 'cep', file), path.join(panel, file));
-    await copyFile(
-      path.join(root, 'assets', 'branding', 'adobe-mcp-icon.png'),
-      path.join(panel, 'icon.png')
-    );
-    await writeFile(
-      path.join(panel, 'config.js'),
-      `window.ADOBE_MCP = ${JSON.stringify({ ...config[app], app, title: info.title, host: info.host })};\n`,
-      { mode: 0o600 }
-    );
-    const values = { APP: app, TITLE: info.title, HOST: info.host, VERSION };
-    const manifest = template.replace(/\{\{([A-Z]+)\}\}/g, (_, key) => {
-      if (!Object.hasOwn(values, key)) throw new Error(`Unknown manifest placeholder: ${key}`);
-      return values[key];
+    await writePanel({
+      app,
+      sourceRoot: root,
+      destination: panel,
+      connection: config[app],
+      version: VERSION
     });
-    await writeFile(path.join(panel, 'CSXS', 'manifest.xml'), manifest);
   }
 
   const mcpServers = Object.fromEntries(

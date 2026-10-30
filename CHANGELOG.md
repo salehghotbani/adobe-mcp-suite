@@ -1,6 +1,12 @@
 # Changelog
 
-## Unreleased
+## 0.2.0 — 2026-10-30
+
+- Add a terminal manager with selectable installation, incremental app selection, removal, configuration export, diagnostics, verified updates and rollback.
+- Bundle Node.js and production dependencies for Windows x64, macOS x64/ARM64 and Linux x64/ARM64; support CEP panels on Windows/macOS and server-only installation on Linux.
+- Add automatic update notifications, persistent check intervals and an opt-out; preserve tokens and selections across version changes.
+- Publish native-runner-tested archives, bootstrap installers, npm/source packaging, checksums, installation instructions and license notices through a release workflow.
+- Display the seven named application badges beside the blue pen project icon.
 
 - Add 38 tools across all seven applications, increasing the default total to 131 while preserving existing tool names and inputs.
 - Add per-server catalog and workflow resources, plus workflow-planning and connection-diagnosis prompts.

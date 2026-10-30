@@ -12,8 +12,13 @@ and the license files supplied with the installed packages, including:
 - @modelcontextprotocol/server, @modelcontextprotocol/client, and
   @modelcontextprotocol/core: Apache-2.0
 - zod: MIT
+- fflate: MIT
 - acorn: MIT
 - prettier (development tooling): MIT
+
+Portable release bundles include Node.js. Its complete license and bundled
+third-party notices are supplied in runtime/LICENSE (and bootstrap/LICENSE
+after installation). Node.js and dependencies retain their original licenses.
 
 Adobe example links in the documentation are references. Their source files
 are not vendored in this repository.

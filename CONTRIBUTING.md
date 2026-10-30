@@ -1,5 +1,9 @@
 # Contributing to Adobe MCP Suite
 
+Terminal manager code lives in `src/cli/` and `src/installer/`. Run `npm run package:release` to build a portable archive for your current platform, then `node scripts/smoke-release.mjs` to verify installation and real MCP stdio from that archive. Packaging installs production dependencies into an isolated staging directory and obtains the matching Node.js license if necessary. Never include generated connection tokens in commits or release assets.
+
+The release workflow builds and tests Windows x64, macOS x64/ARM64, and Linux x64/ARM64 bundles on native runners. A stable `vX.Y.Z` tag must match `package.json` and belong to `main`. Publishing waits for every bundle and its smoke test, assembles checksums and documentation, then publishes the complete draft. Workflow dispatch builds artifacts without publishing. Increment the package version and update `docs/RELEASE-NOTES.md` before tagging a new release.
+
 Bug reports, compatibility results, documentation improvements, and focused application tools are welcome.
 
 ## Before starting
