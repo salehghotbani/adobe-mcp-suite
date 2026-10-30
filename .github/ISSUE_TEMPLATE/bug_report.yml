@@ -1,28 +1,47 @@
 name: Bug report
-description: Report a reproducible problem with a server or Adobe workflow.
+description: Report a reproducible installer, update, MCP server or Adobe workflow problem.
 title: '[Bug]: '
 body:
   - type: markdown
     attributes:
       value: 'Do not include bridge tokens or private media. Report vulnerabilities through the security policy.'
   - type: input
-    id: application
+    id: suite_version
     attributes:
-      label: Adobe application and version
-      placeholder: 'Photoshop 2026, exact build number'
+      label: Adobe MCP Suite version or commit
+      description: 'Use the installed launcher with --version, or provide the source commit.'
+    validations:
+      required: true
+  - type: dropdown
+    id: installation
+    attributes:
+      label: Installation method
+      options:
+        - Portable ZIP
+        - PowerShell bootstrap (install.ps1)
+        - POSIX bootstrap (install.sh)
+        - Source checkout
+        - Source/npm tarball
+        - Other
     validations:
       required: true
   - type: input
+    id: application
+    attributes:
+      label: Adobe application and version, if applicable
+      placeholder: 'Photoshop, exact build number; leave blank for an installer-only issue'
+  - type: input
     id: environment
     attributes:
-      label: Operating system, Node.js version, and MCP client
+      label: Operating system, architecture and MCP client
+      description: 'For source installations, include Node.js/npm versions. For portable installations, Node.js is bundled.'
     validations:
       required: true
   - type: textarea
     id: reproduction
     attributes:
       label: Reproduction
-      description: 'Include the tool name, redacted arguments, and smallest reproduction using disposable files.'
+      description: 'Include selected app IDs, the terminal command or MCP tool name, redacted arguments, and the smallest reproduction using disposable files.'
     validations:
       required: true
   - type: textarea

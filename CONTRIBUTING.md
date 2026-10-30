@@ -1,14 +1,10 @@
 # Contributing to Adobe MCP Suite
 
-Terminal manager code lives in `src/cli/` and `src/installer/`. Run `npm run package:release` to build a portable archive for your current platform, then `node scripts/smoke-release.mjs` to verify installation and real MCP stdio from that archive. Packaging installs production dependencies into an isolated staging directory and obtains the matching Node.js license if necessary. Never include generated connection tokens in commits or release assets.
-
-The release workflow builds and tests Windows x64, macOS x64/ARM64, and Linux x64/ARM64 bundles on native runners. A stable `vX.Y.Z` tag must match `package.json` and belong to `main`. Publishing waits for every bundle and its smoke test, assembles checksums and documentation, then publishes the complete draft. Workflow dispatch builds artifacts without publishing. Increment the package version and update `docs/RELEASE-NOTES.md` before tagging a new release.
-
 Bug reports, compatibility results, documentation improvements, and focused application tools are welcome.
 
 ## Before starting
 
-Read the [README](README.md), [tool catalog](docs/TOOLS.md), [architecture notes](docs/ARCHITECTURE.md), and [security policy](SECURITY.md). For a substantial change or new transport, open an issue describing the problem and proposed behavior before implementation.
+Read the [documentation index](docs/README.md), [tool catalog](docs/TOOLS.md), [architecture notes](docs/ARCHITECTURE.md), and [security policy](SECURITY.md). For a substantial change or new transport, open an issue describing the problem and proposed behavior before implementation.
 
 Do not include bridge tokens, generated panels, local configuration, proprietary Adobe binaries, licensed assets, or private project files in issues or pull requests. Use small synthetic fixtures for reproductions.
 
@@ -23,7 +19,7 @@ npm run check
 npm test
 ```
 
-The tests do not require Adobe installations. Native verification requires the matching installed application and CEP panel. The included panel installer is for Windows; other platforms need separate verification.
+The tests do not require Adobe installations. The terminal manager installs CEP panels on Windows/macOS and supports server-only Linux operation. Native Adobe verification requires the matching installed application and panel. The separate `scripts/install-cep.ps1` script is the older Windows source-development installer; keep its panels separate from a managed home. See [configuration modes](docs/CONFIGURATION.md#managed-installation-and-source-checkout).
 
 ## Development conventions
 
@@ -50,11 +46,26 @@ npm run catalog:check
 git diff --check
 ```
 
-Commit changes to `docs/TOOLS.md` and `docs/tools.json` whenever a tool schema or description changes. Generated `.adobe-mcp/`, `build/`, and `node_modules/` files must remain untracked.
+Commit changes to `docs/TOOLS.md` and `docs/tools.json` whenever a tool schema or description changes. Generated `.adobe-mcp/`, `build/`, `dist/`, `.release-build/` and `node_modules/` files must remain untracked. For documentation-only work, check formatting, local links and `catalog:check`; native Adobe testing is required only when the change needs that behavior to be verified.
 
-Use `npm run format` to apply the shared formatting rules. Keep unit tests in `tests/unit`, integration tests in `tests/integration`, and reusable fixtures in `tests/helpers`. Panel setup belongs in `src/setup`; application metadata and connection validation belong in `src/config`. The public server entrypoints in `src/servers` should remain stable.
+Use `npm run format` to apply the shared formatting rules. Keep unit tests in `tests/unit`, integration tests in `tests/integration`, reusable fixtures in `tests/helpers`, and PowerShell regression checks in `tests/windows`. Panel setup belongs in `src/setup`; application metadata and connection validation belong in `src/config`. Terminal commands live in `src/cli`; managed storage, packaging, updates and rollback belong in `src/installer`. The public server entrypoints in `src/servers` should remain stable.
 
 Add tests for meaningful behavior changes, especially validation, file handling, connection isolation, serialization, queue ordering, and error recovery. Avoid tests that merely repeat implementation details. For Adobe-facing changes, report the exact application version, platform, workflow exercised, and observed result. Clearly distinguish simulated tests from native host tests.
+
+For installer changes, build and smoke-test the portable archive for the current platform:
+
+```sh
+npm run package:release
+node scripts/smoke-release.mjs
+```
+
+Packaging installs production dependencies into an isolated staging directory and obtains the matching Node.js license if necessary. Smoke tests use temporary homes and CEP directories. On Windows, also run `powershell -NoProfile -ExecutionPolicy Bypass -File tests/windows/bootstrap.test.ps1`; it simulates binary checksum responses without network access or changing Adobe settings.
+
+## Documentation changes
+
+Keep documentation in English. Add new guides to [docs/README.md](docs/README.md) and link them from the relevant workflow. Document command defaults and supported flags from the implementation. Keep managed-home and source-checkout instructions explicit, and use synthetic paths rather than real tokens or private files in examples.
+
+The tool catalog and JSON schemas are generated by `npm run catalog`; edit the source definitions before regenerating them. Installation/configuration/troubleshooting guides are maintained manually. Released archives remain versioned snapshots; updates on `main` do not silently change a published ZIP or its checksum.
 
 ## Pull request workflow
 
@@ -68,7 +79,15 @@ Add tests for meaningful behavior changes, especially validation, file handling,
 
 ## Reporting bugs
 
-Use the bug-report issue template. Include the application and Node.js versions, platform, tool name, redacted arguments, expected behavior, observed behavior, and the shortest reproduction. Do not submit sensitive audio, video, images, documents, or access tokens.
+Use the bug-report issue template. Include the suite version, installation method, OS/architecture, selected apps, MCP client and shortest reproduction. For native tool issues, include the Adobe version, tool name and redacted arguments; for source installations, include Node.js/npm versions. First consult [troubleshooting](docs/TROUBLESHOOTING.md). Do not submit sensitive audio, video, images, documents, connection files, panel backups or access tokens.
+
+## Release preparation
+
+The release workflow builds and tests Windows x64, macOS x64/ARM64, and Linux x64/ARM64 bundles on native runners. Relevant code/installer pull requests run the package matrix; the required `CI` workflow validates Node.js 22/24 on Windows, macOS and Linux. Workflow dispatch builds artifacts without publishing.
+
+Before a software release, update `package.json`, the lockfile, `CHANGELOG.md`, versioned installation examples and `docs/RELEASE-NOTES.md`. Merge through the protected branch, then create a stable `vX.Y.Z` tag matching the package version on a commit belonging to `main`. Publishing waits for every bundle and smoke test, assembles bootstrap scripts, documentation and license notices, calculates checksums, and publishes the complete draft. Use a new version for software fixes; do not replace published bundles or move release tags.
+
+Documentation-only corrections can be merged without a new software version. Link the current documentation from release notes when needed, retaining the original release assets and checksums.
 
 For vulnerabilities, follow [SECURITY.md](SECURITY.md) instead of opening a public issue with exploit details.
 

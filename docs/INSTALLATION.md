@@ -1,5 +1,7 @@
 # Terminal installation
 
+See also the [command reference](CLI.md), [MCP client configuration](CONFIGURATION.md), and [troubleshooting guide](TROUBLESHOOTING.md). All commands below refer to the installed stable launcher after initial setup.
+
 Download a portable ZIP from [Releases](https://github.com/salehghotbani/adobe-mcp-suite/releases/latest). Each ZIP includes Node.js and production dependencies. You do not need npm, a global Node installation, or administrator privileges. The manager installs only the MCP server entries and CEP panels you select; shared runtime files are bundled once per version.
 
 ## Choose a package
@@ -22,6 +24,8 @@ Verify the archive against the release's `SHA256SUMS`, then extract it into a te
 
 ```powershell
 Get-FileHash .\adobe-mcp-suite-v0.2.1-windows-x64.zip -Algorithm SHA256
+Get-Content .\SHA256SUMS
+# Compare the hash with the entry for this exact ZIP before extracting.
 Expand-Archive .\adobe-mcp-suite-v0.2.1-windows-x64.zip .\adobe-mcp-bundle
 cd adobe-mcp-bundle
 .\adobe-mcp.cmd install --apps photoshop,premiere-pro --enable-unsigned
@@ -68,7 +72,7 @@ adobe-mcp config
 adobe-mcp doctor
 ```
 
-Import `<home>/mcp-servers.json`, or the output of `config`, into your MCP client. Each entry uses an absolute stable launcher that follows the active version after updates. Reconnect the MCP client after changing selections or versions. Run `connection_status` to verify the native panel is polling. MCP protocol output stays on stdout; diagnostics and update notifications use stderr.
+Import `<home>/mcp-servers.json`, or the output of `config`, into your MCP client using its local-server format. Each entry uses an absolute stable launcher that follows the active version after updates. Reconnect the MCP client after changing selections or versions. Import newly added application entries and remove entries for uninstalled applications from the client's own configuration. Run `connection_status` to verify the native panel is polling. MCP protocol output stays on stdout; diagnostics and update notifications use stderr. See [CONFIGURATION.md](CONFIGURATION.md) for complete JSON examples and environment settings.
 
 ## Select applications
 
@@ -116,6 +120,6 @@ Restart Adobe and reconnect MCP servers after updating or rolling back. Already 
 
 Developers can use Node.js 22+ and `npm ci`, then `node bin/adobe-mcp.mjs install --apps ps --server-only`. Source installation copies the current runtime and dependencies and may fetch its matching license from the official Node.js repository if the local distribution omits it. Portable releases include all required licenses and production dependencies. The `.tgz` release asset is source-oriented and requires Node.js/npm; it is not a self-contained runtime bundle.
 
-`doctor` reports installation metadata and verifies the active bundle, configuration and selected panel ownership. It cannot certify native Adobe behavior. If the CEP panel is missing, check unsigned panel settings and the installed host's CEP support. If the bridge port is occupied, stop duplicate servers or edit the app's port in `<home>/connections.json`, then rerun `install --apps <id>` to regenerate matching panels. Keep that file private: it contains tokens.
+`status` reports installation metadata. `doctor` verifies the active bundle, version pointer, configuration, bootstrap file presence and selected panel ownership. It does not probe Adobe or the live bridge. If the CEP panel is missing, check unsigned panel settings and the installed host's CEP support. If the bridge port is occupied, stop duplicate servers or follow the [saved port/token change procedure](CONFIGURATION.md#change-a-saved-port-or-rotate-a-token). Connection files contain tokens and must remain private. Same-version installation reuses its version directory; see [verification recovery](TROUBLESHOOTING.md#a-download-or-bundle-fails-verification) for damaged bundles.
 
 The installation lock prevents concurrent changes. A lock older than five minutes is recovered only if its process no longer exists. An invalid or busy lock should be inspected after closing all manager processes. Restore damaged state from a backup rather than deleting files while a server is running.
