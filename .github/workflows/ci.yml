@@ -43,9 +43,7 @@ jobs:
       - name: Run protocol and transport tests
         run: npm test
       - name: Verify generated tool documentation
-        run: |
-          npm run catalog
-          git diff --exit-code -- docs/TOOLS.md docs/tools.json
+        run: npm run catalog:check
       - name: Validate Windows installer and manifests
         if: runner.os == 'Windows'
         shell: pwsh

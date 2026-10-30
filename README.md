@@ -1,7 +1,7 @@
 # Adobe MCP Suite
 
 <p align="center">
-  <img src="assets/adobe-mcp-icon.png" width="180" alt="Blue pen nib and connection nodes on a navy app tile">
+  <img src="assets/branding/adobe-mcp-icon.png" width="180" alt="Blue pen nib and connection nodes on a navy app tile">
 </p>
 
 Seven independent [Model Context Protocol](https://modelcontextprotocol.io/) servers for Adobe creative applications. Each server has its own tool catalog, authenticated loopback bridge, and CEP panel. Connect only the applications you need.
@@ -12,15 +12,15 @@ Built with JavaScript and the official MCP SDK. No API key or cloud backend is r
 
 ## Applications and tools
 
-| Application | Server entrypoint | Default port | Default tools | Main workflows |
-| --- | --- | --- | --- | --- |
-| Premiere Pro | `src/servers/premiere-pro.mjs` | 19101 | 14 | Project bins, media import, sequences, timeline clips, markers, export |
-| Photoshop | `src/servers/photoshop.mjs` | 19102 | 14 | Documents, layers, text, resizing, PSD and image export |
-| Media Encoder | `src/servers/media-encoder.mjs` | 19103 | 11 | Media and Dynamic Link queues, batch controls, formats |
-| Illustrator | `src/servers/illustrator.mjs` | 19104 | 15 | Documents, layers, artboards, shapes, text, AI/SVG/PNG export |
-| InDesign | `src/servers/indesign.mjs` | 19105 | 14 | Pages, text frames, image placement, INDD and PDF export |
-| After Effects | `src/servers/after-effects.mjs` | 19106 | 17 | Compositions, footage, layers, transforms, keyframes, rendering |
-| Audition | `src/servers/audition.mjs` | 19107 | 8 | Command discovery and invocation, waveform information, playhead |
+| Application   | Server entrypoint               | Default port | Default tools | Main workflows                                                         |
+| ------------- | ------------------------------- | ------------ | ------------- | ---------------------------------------------------------------------- |
+| Premiere Pro  | `src/servers/premiere-pro.mjs`  | 19101        | 14            | Project bins, media import, sequences, timeline clips, markers, export |
+| Photoshop     | `src/servers/photoshop.mjs`     | 19102        | 14            | Documents, layers, text, resizing, PSD and image export                |
+| Media Encoder | `src/servers/media-encoder.mjs` | 19103        | 11            | Media and Dynamic Link queues, batch controls, formats                 |
+| Illustrator   | `src/servers/illustrator.mjs`   | 19104        | 15            | Documents, layers, artboards, shapes, text, AI/SVG/PNG export          |
+| InDesign      | `src/servers/indesign.mjs`      | 19105        | 14            | Pages, text frames, image placement, INDD and PDF export               |
+| After Effects | `src/servers/after-effects.mjs` | 19106        | 17            | Compositions, footage, layers, transforms, keyframes, rendering        |
+| Audition      | `src/servers/audition.mjs`      | 19107        | 8             | Command discovery and invocation, waveform information, playhead       |
 
 **93 tools are enabled by default.** Every server includes `connection_status` and `get_app_info`. Enabling the optional `run_script` adds one tool per server.
 
@@ -106,13 +106,13 @@ Unicode parameters are preserved. Text rendering, fonts, shaping, and writing di
 
 Set these environment variables on an individual MCP server entry:
 
-| Variable | Purpose |
-| --- | --- |
-| `ADOBE_MCP_CONFIG` | Alternative configuration file; defaults to `.adobe-mcp/config.json` in the checkout |
-| `ADOBE_MCP_PORT` | Override the server's loopback port |
-| `ADOBE_MCP_TOKEN` | Override its bridge token; at least 32 characters |
-| `ADOBE_MCP_TIMEOUT_MS` | Operation deadline; defaults to `60000`, allowed range `100`–`3600000` |
-| `ADOBE_MCP_ALLOW_SCRIPTS` | Set exactly `true` to expose `run_script` with full ExtendScript permissions |
+| Variable                  | Purpose                                                                              |
+| ------------------------- | ------------------------------------------------------------------------------------ |
+| `ADOBE_MCP_CONFIG`        | Alternative configuration file; defaults to `.adobe-mcp/config.json` in the checkout |
+| `ADOBE_MCP_PORT`          | Override the server's loopback port                                                  |
+| `ADOBE_MCP_TOKEN`         | Override its bridge token; 32–1024 visible ASCII characters                          |
+| `ADOBE_MCP_TIMEOUT_MS`    | Operation deadline; defaults to `60000`, allowed range `100`–`3600000`               |
+| `ADOBE_MCP_ALLOW_SCRIPTS` | Set exactly `true` to expose `run_script` with full ExtendScript permissions         |
 
 For long renders, increase both the server deadline and your MCP client's tool timeout. To change a port or token permanently, edit `.adobe-mcp/config.json`, rerun setup, and reinstall the affected panel with `-Force`. Server environment overrides must match the installed panel's configuration.
 
@@ -150,17 +150,41 @@ npm ci
 npm run check
 npm test
 npm run catalog
+npm run catalog:check
 ```
 
-`check` validates JavaScript syntax, checks for duplicate tool names, and parses every generated host script as ES3. Tests cover real MCP stdio connections for all seven servers, catalog isolation, schemas, authenticated HTTP transport, queue ordering, deadlines, Unicode, file checks, and the actual panel code running against a simulated Adobe host. Loopback HTTP must be allowed by the test environment.
+`check` verifies consistent formatting, validates JavaScript syntax, checks for duplicate tool names, and parses every generated host script as ES3. Use `npm run format` to format source files. `catalog:check` verifies generated documentation without modifying files. Tests cover real MCP stdio connections for all seven servers, catalog isolation, schemas, configuration validation, repeatable panel setup, authenticated HTTP transport, queue ordering, deadlines, Unicode, file checks, and the actual panel code running against a simulated Adobe host. Loopback HTTP must be allowed by the test environment.
 
 GitHub Actions runs the checks on Windows and Linux with Node.js 22 and 24. These checks do not replace native Adobe integration testing.
 
 Read [CONTRIBUTING.md](CONTRIBUTING.md) for the workflow and validation expectations. The [changelog](CHANGELOG.md) records release changes.
 
+## Project layout
+
+```text
+src/
+  apps/        Application-specific tool catalogs and host scripts
+  bridge/      Authenticated HTTP transport and ExtendScript serialization
+  catalog/     Generated documentation model
+  config/      Application metadata, project paths, version, and settings
+  mcp/         MCP registration, common tools, and input schemas
+  servers/     Seven stable executable entrypoints
+  setup/       Repeatable panel and client-configuration generation
+cep/           Panel HTML, CSS, JavaScript, and manifest template
+scripts/       Development and installation commands
+tests/
+  unit/        Configuration, catalog, and host-script checks
+  integration/ MCP, bridge, panel, and setup workflows
+  helpers/     Disposable test fixtures
+assets/branding/ Active icon, design prompt, and archived designs
+docs/          Architecture notes and generated tool reference
+```
+
+Only `build/` and `.adobe-mcp/` are generated locally. The source layout does not change the server entrypoints used by existing MCP client configurations.
+
 ## Project icon
 
-The [project icon](assets/adobe-mcp-icon.png) uses a sapphire pen nib, cyan edges, and seven connection nodes on a navy tile. It is included in all generated panels. The [design prompt](assets/icon-prompt-blue-pen.txt) and earlier design files are retained in `assets/`.
+The [project icon](assets/branding/adobe-mcp-icon.png) uses a sapphire pen nib, cyan edges, and seven connection nodes on a navy tile. It is included in all generated panels. The [design prompt](assets/branding/blue-pen-prompt.txt) and earlier design files are retained in `assets/branding/`.
 
 ## License and attribution
 

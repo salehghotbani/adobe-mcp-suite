@@ -13,6 +13,7 @@ and the license files supplied with the installed packages, including:
   @modelcontextprotocol/core: Apache-2.0
 - zod: MIT
 - acorn: MIT
+- prettier (development tooling): MIT
 
 Adobe example links in the documentation are references. Their source files
 are not vendored in this repository.

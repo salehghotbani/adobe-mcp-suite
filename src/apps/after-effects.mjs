@@ -1,23 +1,266 @@
 import { z } from 'zod';
-import { tool, text, filePath, outputFields, outputFieldsFor, index, pageSize, rgb } from '../core/tool.mjs';
-const project='h.require(app.project,"Open or create a project first.");\n';
-const comp=project+'h.require(p.compIndex<=app.project.numItems,"Item not found.");var c=app.project.item(p.compIndex);h.require(c instanceof CompItem,"Item is not a composition.");\n';
-const layer=comp+'h.require(p.layerIndex<=c.numLayers,"Layer not found.");var l=c.layer(p.layerIndex);\n';
-const transform='var t=l.property("ADBE Transform Group");\n';
+import { tool } from '../mcp/tool.mjs';
+import {
+  text,
+  filePath,
+  outputFields,
+  outputFieldsFor,
+  index,
+  pageSize,
+  rgb
+} from '../mcp/schemas.mjs';
+const project = `
+  h.require(app.project, 'Open or create a project first.');
+`;
+const comp =
+  project +
+  `
+  h.require(p.compIndex <= app.project.numItems, 'Item not found.');
+  var c = app.project.item(p.compIndex);
+  h.require(c instanceof CompItem, 'Item is not a composition.');
+`;
+const layer =
+  comp +
+  `
+  h.require(p.layerIndex <= c.numLayers, 'Layer not found.');
+  var l = c.layer(p.layerIndex);
+`;
+const transform = `
+  var t = l.property('ADBE Transform Group');
+`;
 export const tools = [
-  tool('get_project', 'Read current After Effects project information.', {}, project+'return {file:app.project.file?app.project.file.fsName:null,items:app.project.numItems};',true),
-  tool('open_project', 'Open an existing AEP project. Refuse if another project is already open with items.', {path:filePath}, 'h.require(!app.project||app.project.numItems===0,"Save and close the current project before opening another.");var f=h.input(p.path);app.open(f);return {file:app.project.file.fsName};'),
-  tool('save_project_as', 'Save the current project as an AEP file.', outputFieldsFor('aep'), project+'var f=h.output(p.path,p.overwrite);app.project.save(f);return {path:f.fsName};'),
-  tool('list_items', 'List project items with one-based indexes and stable item IDs.', pageSize, project+'var a=[];for(var i=p.offset+1;i<=app.project.numItems&&a.length<p.limit;i++){var item=app.project.item(i);a.push({index:i,id:item.id,name:item.name,type:item.typeName,isComposition:item instanceof CompItem});}return {total:app.project.numItems,items:a};',true),
-  tool('import_file', 'Import a local media file into the project.', {path:filePath}, project+'var item=app.project.importFile(new ImportOptions(h.input(p.path)));return {id:item.id,name:item.name};'),
-  tool('create_composition', 'Create a composition with pixel dimensions and duration in seconds.', {name:text,width:z.number().int().min(4).max(30000).default(1920),height:z.number().int().min(4).max(30000).default(1080),duration:z.number().min(0.01).max(10800).default(10),frameRate:z.number().min(1).max(120).default(30)}, project+'var c=app.project.items.addComp(p.name,p.width,p.height,1,p.duration,p.frameRate);return {id:c.id,name:c.name};'),
-  tool('list_layers', 'Read layers of a composition, with one-based layer indexes.', {compIndex:index,...pageSize}, comp+'var a=[];for(var i=p.offset+1;i<=c.numLayers&&a.length<p.limit;i++){var l=c.layer(i);a.push({index:i,name:l.name,enabled:l.enabled,inPoint:l.inPoint,outPoint:l.outPoint});}return {total:c.numLayers,layers:a};',true),
-  tool('add_text', 'Add a text layer to a composition.', {compIndex:index,text,size:z.number().positive().max(1296).default(72)}, comp+'var l=c.layers.addText(p.text);var prop=l.property("ADBE Text Properties").property("ADBE Text Document");var td=prop.value;td.fontSize=p.size;prop.setValue(td);return {index:l.index,name:l.name};'),
-  tool('add_solid', 'Add a full-frame solid layer with RGB values from zero to one.', {compIndex:index,name:text,color:rgb.default([0.1,0.1,0.1])}, comp+'var l=c.layers.addSolid(p.color,p.name,c.width,c.height,c.pixelAspect,c.duration);return {index:l.index,name:l.name};'),
-  tool('add_footage_layer', 'Add an existing project footage or composition item to a composition.', {compIndex:index,itemIndex:index}, comp+'h.require(p.itemIndex<=app.project.numItems,"Source item not found.");var source=app.project.item(p.itemIndex);h.require(source instanceof CompItem||source instanceof FootageItem,"Source is not footage or a composition.");h.require(source!==c,"Cannot nest a composition inside itself.");var l=c.layers.add(source);return {index:l.index,name:l.name};'),
-  tool('set_transform', 'Set static 2D position, scale, rotation and opacity. Existing keyframes cause Adobe to reject static changes.', {compIndex:index,layerIndex:index,position:z.tuple([z.number(),z.number()]).optional(),scale:z.tuple([z.number().positive(),z.number().positive()]).optional(),rotation:z.number().optional(),opacity:z.number().min(0).max(100).optional()}, layer+transform+'h.require(!l.threeDLayer,"This tool supports 2D layers only.");if(p.position)t.property("ADBE Position").setValue(p.position);if(p.scale)t.property("ADBE Scale").setValue(p.scale);if(p.rotation!==undefined)t.property("ADBE Rotate Z").setValue(p.rotation);if(p.opacity!==undefined)t.property("ADBE Opacity").setValue(p.opacity);return {index:l.index,name:l.name};'),
-  tool('set_opacity_keyframe', 'Set an opacity keyframe at a time in seconds.', {compIndex:index,layerIndex:index,time:z.number().min(0),opacity:z.number().min(0).max(100)}, layer+transform+'h.require(p.time<=c.duration,"Time exceeds composition duration.");t.property("ADBE Opacity").setValueAtTime(p.time,p.opacity);return {time:p.time,opacity:p.opacity};'),
-  tool('add_to_render_queue', 'Queue a composition for rendering using existing Render Settings / Output Module template names.', {compIndex:index,...outputFields,renderTemplate:text.optional(),outputTemplate:text.optional()}, comp+'var f=h.output(p.path,p.overwrite);var r=app.project.renderQueue.items.add(c);try{if(p.renderTemplate)r.applyTemplate(p.renderTemplate);var om=r.outputModule(1);if(p.outputTemplate)om.applyTemplate(p.outputTemplate);om.file=f;h.output(om.file.fsName,p.overwrite);return {index:app.project.renderQueue.numItems,path:om.file.fsName,status:String(r.status)};}catch(e){r.remove();throw e;}'),
-  tool('list_render_queue', 'Read queued render items and their native status values.', {}, project+'var a=[];for(var i=1;i<=app.project.renderQueue.numItems;i++){var r=app.project.renderQueue.item(i);a.push({index:i,composition:r.comp.name,status:String(r.status),render:r.render});}return a;',true),
-  tool('render_queue', 'Render all enabled queued items synchronously. This can take a long time; configure ADOBE_MCP_TIMEOUT_MS accordingly.', {}, project+'app.project.renderQueue.render();return {completed:true};')
+  tool(
+    'get_project',
+    'Read current After Effects project information.',
+    {},
+    project +
+      `
+  return { file: app.project.file ? app.project.file.fsName : null, items: app.project.numItems };
+`,
+    true
+  ),
+  tool(
+    'open_project',
+    'Open an existing AEP project. Refuse if another project is already open with items.',
+    { path: filePath },
+    `
+  h.require(
+    !app.project || app.project.numItems === 0,
+    'Save and close the current project before opening another.'
+  );
+  var f = h.input(p.path);
+  app.open(f);
+  return { file: app.project.file.fsName };
+`
+  ),
+  tool(
+    'save_project_as',
+    'Save the current project as an AEP file.',
+    outputFieldsFor('aep'),
+    project +
+      `
+  var f = h.output(p.path, p.overwrite);
+  app.project.save(f);
+  return { path: f.fsName };
+`
+  ),
+  tool(
+    'list_items',
+    'List project items with one-based indexes and stable item IDs.',
+    pageSize,
+    project +
+      `
+  var a = [];
+  for (var i = p.offset + 1; i <= app.project.numItems && a.length < p.limit; i++) {
+    var item = app.project.item(i);
+    a.push({
+      index: i,
+      id: item.id,
+      name: item.name,
+      type: item.typeName,
+      isComposition: item instanceof CompItem
+    });
+  }
+  return { total: app.project.numItems, items: a };
+`,
+    true
+  ),
+  tool(
+    'import_file',
+    'Import a local media file into the project.',
+    { path: filePath },
+    project +
+      `
+  var item = app.project.importFile(new ImportOptions(h.input(p.path)));
+  return { id: item.id, name: item.name };
+`
+  ),
+  tool(
+    'create_composition',
+    'Create a composition with pixel dimensions and duration in seconds.',
+    {
+      name: text,
+      width: z.number().int().min(4).max(30000).default(1920),
+      height: z.number().int().min(4).max(30000).default(1080),
+      duration: z.number().min(0.01).max(10800).default(10),
+      frameRate: z.number().min(1).max(120).default(30)
+    },
+    project +
+      `
+  var c = app.project.items.addComp(p.name, p.width, p.height, 1, p.duration, p.frameRate);
+  return { id: c.id, name: c.name };
+`
+  ),
+  tool(
+    'list_layers',
+    'Read layers of a composition, with one-based layer indexes.',
+    { compIndex: index, ...pageSize },
+    comp +
+      `
+  var a = [];
+  for (var i = p.offset + 1; i <= c.numLayers && a.length < p.limit; i++) {
+    var l = c.layer(i);
+    a.push({
+      index: i,
+      name: l.name,
+      enabled: l.enabled,
+      inPoint: l.inPoint,
+      outPoint: l.outPoint
+    });
+  }
+  return { total: c.numLayers, layers: a };
+`,
+    true
+  ),
+  tool(
+    'add_text',
+    'Add a text layer to a composition.',
+    { compIndex: index, text, size: z.number().positive().max(1296).default(72) },
+    comp +
+      `
+  var l = c.layers.addText(p.text);
+  var prop = l.property('ADBE Text Properties').property('ADBE Text Document');
+  var td = prop.value;
+  td.fontSize = p.size;
+  prop.setValue(td);
+  return { index: l.index, name: l.name };
+`
+  ),
+  tool(
+    'add_solid',
+    'Add a full-frame solid layer with RGB values from zero to one.',
+    { compIndex: index, name: text, color: rgb.default([0.1, 0.1, 0.1]) },
+    comp +
+      `
+  var l = c.layers.addSolid(p.color, p.name, c.width, c.height, c.pixelAspect, c.duration);
+  return { index: l.index, name: l.name };
+`
+  ),
+  tool(
+    'add_footage_layer',
+    'Add an existing project footage or composition item to a composition.',
+    { compIndex: index, itemIndex: index },
+    comp +
+      `
+  h.require(p.itemIndex <= app.project.numItems, 'Source item not found.');
+  var source = app.project.item(p.itemIndex);
+  h.require(
+    source instanceof CompItem || source instanceof FootageItem,
+    'Source is not footage or a composition.'
+  );
+  h.require(source !== c, 'Cannot nest a composition inside itself.');
+  var l = c.layers.add(source);
+  return { index: l.index, name: l.name };
+`
+  ),
+  tool(
+    'set_transform',
+    'Set static 2D position, scale, rotation and opacity. Existing keyframes cause Adobe to reject static changes.',
+    {
+      compIndex: index,
+      layerIndex: index,
+      position: z.tuple([z.number(), z.number()]).optional(),
+      scale: z.tuple([z.number().positive(), z.number().positive()]).optional(),
+      rotation: z.number().optional(),
+      opacity: z.number().min(0).max(100).optional()
+    },
+    layer +
+      transform +
+      `
+  h.require(!l.threeDLayer, 'This tool supports 2D layers only.');
+  if (p.position) t.property('ADBE Position').setValue(p.position);
+  if (p.scale) t.property('ADBE Scale').setValue(p.scale);
+  if (p.rotation !== undefined) t.property('ADBE Rotate Z').setValue(p.rotation);
+  if (p.opacity !== undefined) t.property('ADBE Opacity').setValue(p.opacity);
+  return { index: l.index, name: l.name };
+`
+  ),
+  tool(
+    'set_opacity_keyframe',
+    'Set an opacity keyframe at a time in seconds.',
+    {
+      compIndex: index,
+      layerIndex: index,
+      time: z.number().min(0),
+      opacity: z.number().min(0).max(100)
+    },
+    layer +
+      transform +
+      `
+  h.require(p.time <= c.duration, 'Time exceeds composition duration.');
+  t.property('ADBE Opacity').setValueAtTime(p.time, p.opacity);
+  return { time: p.time, opacity: p.opacity };
+`
+  ),
+  tool(
+    'add_to_render_queue',
+    'Queue a composition for rendering using existing Render Settings / Output Module template names.',
+    {
+      compIndex: index,
+      ...outputFields,
+      renderTemplate: text.optional(),
+      outputTemplate: text.optional()
+    },
+    comp +
+      `
+  var f = h.output(p.path, p.overwrite);
+  var r = app.project.renderQueue.items.add(c);
+  try {
+    if (p.renderTemplate) r.applyTemplate(p.renderTemplate);
+    var om = r.outputModule(1);
+    if (p.outputTemplate) om.applyTemplate(p.outputTemplate);
+    om.file = f;
+    h.output(om.file.fsName, p.overwrite);
+    return {
+      index: app.project.renderQueue.numItems,
+      path: om.file.fsName,
+      status: String(r.status)
+    };
+  } catch (e) {
+    r.remove();
+    throw e;
+  }
+`
+  ),
+  tool(
+    'list_render_queue',
+    'Read queued render items and their native status values.',
+    {},
+    project +
+      `
+  var a = [];
+  for (var i = 1; i <= app.project.renderQueue.numItems; i++) {
+    var r = app.project.renderQueue.item(i);
+    a.push({ index: i, composition: r.comp.name, status: String(r.status), render: r.render });
+  }
+  return a;
+`,
+    true
+  ),
+  tool(
+    'render_queue',
+    'Render all enabled queued items synchronously. This can take a long time; configure ADOBE_MCP_TIMEOUT_MS accordingly.',
+    {},
+    project + 'app.project.renderQueue.render();return {completed:true};'
+  )
 ];

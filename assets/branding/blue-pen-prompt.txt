@@ -1,5 +1,5 @@
 Edited with the built-in image_gen tool on 2026-10-30.
-Source: assets/adobe-mcp-icon-red-original.png
+Source: assets/branding/archive/red-icon.png
 
 Use case: precise-object-edit
 Asset type: Adobe MCP project app icon.

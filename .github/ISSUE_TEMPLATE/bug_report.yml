@@ -1,15 +1,15 @@
 name: Bug report
 description: Report a reproducible problem with a server or Adobe workflow.
-title: "[Bug]: "
+title: '[Bug]: '
 body:
   - type: markdown
     attributes:
-      value: "Do not include bridge tokens or private media. Report vulnerabilities through the security policy."
+      value: 'Do not include bridge tokens or private media. Report vulnerabilities through the security policy.'
   - type: input
     id: application
     attributes:
       label: Adobe application and version
-      placeholder: "Photoshop 2026, exact build number"
+      placeholder: 'Photoshop 2026, exact build number'
     validations:
       required: true
   - type: input
@@ -22,7 +22,7 @@ body:
     id: reproduction
     attributes:
       label: Reproduction
-      description: "Include the tool name, redacted arguments, and smallest reproduction using disposable files."
+      description: 'Include the tool name, redacted arguments, and smallest reproduction using disposable files.'
     validations:
       required: true
   - type: textarea
