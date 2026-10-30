@@ -21,7 +21,9 @@ if ($asset.Count -ne 1 -or $sums.Count -ne 1 -or $asset[0].browser_download_url 
 $temporary = Join-Path ([IO.Path]::GetTempPath()) ('adobe-mcp-install-' + [guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $temporary | Out-Null
 try {
-    $checksumText = (Invoke-WebRequest "${baseUrl}SHA256SUMS" -UseBasicParsing).Content
+    $checksumPath = Join-Path $temporary 'SHA256SUMS'
+    Invoke-WebRequest "${baseUrl}SHA256SUMS" -OutFile $checksumPath -UseBasicParsing
+    $checksumText = Get-Content -LiteralPath $checksumPath -Raw -Encoding UTF8
     $checksumLines = @($checksumText -split '\r?\n' | Where-Object { $_ -match ('^[a-fA-F0-9]{64}\s+\*?' + [regex]::Escape($name) + '$') })
     if ($checksumLines.Count -ne 1) { throw 'Missing or ambiguous checksum.' }
     $expected = ($checksumLines[0] -split '\s+')[0].ToLowerInvariant()

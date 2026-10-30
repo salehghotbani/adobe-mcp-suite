@@ -49,6 +49,10 @@ jobs:
       - run: npm run setup
       - run: npm run check
       - run: npm test
+      - name: Test PowerShell bootstrap with binary HTTP responses
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: '& ./tests/windows/bootstrap.test.ps1'
       - run: npm run catalog:check
       - run: npm run package:release
       - run: node scripts/smoke-release.mjs

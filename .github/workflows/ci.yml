@@ -58,6 +58,7 @@ jobs:
           $manifests = @(Get-ChildItem -LiteralPath 'build/cep' -Filter manifest.xml -Recurse)
           if ($manifests.Count -ne 7) { throw 'Expected seven generated manifests.' }
           foreach ($manifest in $manifests) { [xml](Get-Content -LiteralPath $manifest.FullName -Raw) | Out-Null }
+          & ./tests/windows/bootstrap.test.ps1
 
   ci:
     name: CI

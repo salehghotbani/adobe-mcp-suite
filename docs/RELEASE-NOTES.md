@@ -1,6 +1,8 @@
-# Adobe MCP Suite v0.2.0
+# Adobe MCP Suite v0.2.1
 
 Terminal installation and version management for seven independent Adobe MCP servers, with 131 default tools and per-server resources and prompts.
+
+This patch fixes the Windows bootstrap's handling of GitHub's binary checksum responses. Existing v0.2.0 installations can use `adobe-mcp update`; new users should download v0.2.1.
 
 - Select Premiere Pro (Pr), Photoshop (Ps), Media Encoder (Me), Illustrator (Ai), InDesign (Id), After Effects (Ae), Audition (Au), or any combination.
 - Portable Windows x64, macOS Intel/Apple Silicon, and Linux x64/ARM64 ZIPs include Node.js and production dependencies. Linux supports server-only mode.
@@ -9,7 +11,7 @@ Terminal installation and version management for seven independent Adobe MCP ser
 - SHA-256 checksums, per-file bundle verification, safer extraction, panel backups and transaction recovery.
 - Blue pen icon accompanied by named application letter badges.
 
-Download your platform's ZIP and read `INSTALLATION.md`. `install.ps1` and `install.sh` are optional latest-release bootstrap installers. `adobe-mcp-suite-0.2.0.tgz` is the source/npm package and requires a separately installed Node.js/npm. GitHub's source archives are also available. `SHA256SUMS`, `LICENSE` and `NOTICE` accompany the assets; dependency and Node.js licenses are included inside the ZIPs.
+Download your platform's ZIP and read `INSTALLATION.md`. `install.ps1` and `install.sh` are optional latest-release bootstrap installers. `adobe-mcp-suite-0.2.1.tgz` is the source/npm package and requires a separately installed Node.js/npm. GitHub's source archives are also available. `SHA256SUMS`, `LICENSE` and `NOTICE` accompany the assets; dependency and Node.js licenses are included inside the ZIPs.
 
 All portable bundles are built on native runners and smoke-tested by installing selected tools, preserving tokens across incremental installation, starting real MCP stdio sessions through stable launchers, and removing a selection. Automated tests cover update integrity failures, rollback, storage safety and the existing protocol/bridge behavior.
 
