@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { mkdtemp, readFile } from 'node:fs/promises';
+import { mkdtemp, readFile, readdir } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { promisify } from 'node:util';
@@ -54,6 +54,22 @@ try {
   }
   await run('uninstall', '--apps', 'ps', '--root', home);
   assert.equal(JSON.parse((await run('status', '--root', home)).stdout).applications.length, 2);
+  assert.equal(JSON.parse((await run('doctor', '--root', home)).stdout).healthy, true);
+  if (process.platform !== 'linux') {
+    const panelHome = path.join(temporary, 'panel installation'),
+      extensions = path.join(temporary, 'CEP extensions');
+    await run('install', '--apps', 'all', '--root', panelHome, '--extensions-dir', extensions);
+    assert.equal(
+      (await readdir(extensions)).filter((name) => name.startsWith('com.adobemcp.')).length,
+      7
+    );
+    assert.equal(JSON.parse((await run('doctor', '--root', panelHome)).stdout).healthy, true);
+    await run('uninstall', '--all', '--root', panelHome);
+    assert.equal(
+      (await readdir(extensions)).filter((name) => name.startsWith('com.adobemcp.')).length,
+      0
+    );
+  }
   console.log(
     'Portable installation, stable launchers, incremental selection and MCP stdio passed.'
   );
