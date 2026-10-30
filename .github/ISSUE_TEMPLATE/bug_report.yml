@@ -1,0 +1,38 @@
+name: Bug report
+description: Report a reproducible problem with a server or Adobe workflow.
+title: "[Bug]: "
+body:
+  - type: markdown
+    attributes:
+      value: "Do not include bridge tokens or private media. Report vulnerabilities through the security policy."
+  - type: input
+    id: application
+    attributes:
+      label: Adobe application and version
+      placeholder: "Photoshop 2026, exact build number"
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Operating system, Node.js version, and MCP client
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: "Include the tool name, redacted arguments, and smallest reproduction using disposable files."
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Expected and observed behavior
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Redacted errors or logs
+      render: text

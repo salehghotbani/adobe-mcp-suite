@@ -1,0 +1,18 @@
+Adobe MCP Suite
+Copyright (c) 2026 Saleh Ghotbani
+
+This project is an independent integration and is not affiliated with,
+sponsored by, or endorsed by Adobe. Adobe and the referenced Adobe product
+names are trademarks of their respective owner. The project license does
+not grant rights to Adobe trademarks, applications, SDKs, fonts, or media.
+
+Third-party packages retain their own licenses. Consult package-lock.json
+and the license files supplied with the installed packages, including:
+
+- @modelcontextprotocol/server, @modelcontextprotocol/client, and
+  @modelcontextprotocol/core: Apache-2.0
+- zod: MIT
+- acorn: MIT
+
+Adobe example links in the documentation are references. Their source files
+are not vendored in this repository.

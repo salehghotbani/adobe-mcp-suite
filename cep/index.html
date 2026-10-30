@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src http://127.0.0.1:*">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Adobe MCP</title>
+  <link rel="stylesheet" href="panel.css">
+</head>
+<body>
+  <main>
+    <header><img src="icon.png" alt="Adobe MCP"><div><span class="eyebrow">CREATIVE TOOLS, CONNECTED</span><h1>Adobe MCP</h1></div></header>
+    <section class="card"><div class="row"><span id="app">Adobe bridge</span><span id="state" role="status">Starting</span></div><p id="detail">Keep this panel open while using MCP tools.</p></section>
+    <div class="row controls"><span id="count">0 operations completed</span><button id="toggle" type="button">Disconnect</button></div>
+    <p class="footnote">Local connection · 127.0.0.1<br>Independent project for Adobe creative apps</p>
+  </main>
+  <script src="config.js"></script><script src="panel.js"></script>
+</body>
+</html>

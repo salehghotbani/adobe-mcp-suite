@@ -1,0 +1,11 @@
+Generated with the built-in image_gen tool on 2026-10-30.
+
+Use case: logo-brand
+Asset type: polished application icon for an independent developer project called Adobe MCP, connecting seven Adobe creative applications to AI tools.
+Primary request: Create one beautiful square app icon: a bold sculptural angular Adobe-inspired letter A, made of two precise satin crimson-red folded ribbon facets, with a small luminous seven-node connection motif subtly integrated into its lower negative space. It must read clearly at small sizes.
+Scene/backdrop: near-black charcoal rounded-square tile, generous safe margins, isolated clean composition.
+Style/medium: premium minimal 3D brand icon, crisp geometric edges, refined shallow bevels, restrained soft studio highlights, understated depth, no clutter.
+Color palette: Adobe crimson as the main color; tiny connector accents in violet, magenta, orange, cyan and green representing the creative suite.
+Composition/framing: centered front view, large single emblem, full icon tile visible with balanced margins, square 1024px composition.
+Text: no words, no labels.
+Constraints: original project mark inspired by Adobe, no official endorsement badges, no watermark, no mockup devices, no additional objects.

@@ -1,0 +1,34 @@
+{
+  "name": "adobe-mcp-suite",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Seven independent local MCP servers for Adobe creative applications",
+  "license": "MIT",
+  "author": "Saleh Ghotbani",
+  "repository": { "type": "git", "url": "https://github.com/salehghotbani/adobe-mcp-suite.git" },
+  "homepage": "https://github.com/salehghotbani/adobe-mcp-suite#readme",
+  "bugs": { "url": "https://github.com/salehghotbani/adobe-mcp-suite/issues" },
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "setup": "node scripts/setup.mjs",
+    "start:premiere": "node src/servers/premiere-pro.mjs",
+    "start:photoshop": "node src/servers/photoshop.mjs",
+    "start:encoder": "node src/servers/media-encoder.mjs",
+    "start:illustrator": "node src/servers/illustrator.mjs",
+    "start:indesign": "node src/servers/indesign.mjs",
+    "start:after-effects": "node src/servers/after-effects.mjs",
+    "start:audition": "node src/servers/audition.mjs",
+    "check": "node scripts/check.mjs",
+    "test": "node --test --test-concurrency=1 tests/*.test.mjs",
+    "catalog": "node scripts/catalog.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/server": "^2.4.0",
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "@modelcontextprotocol/client": "^2.4.0",
+    "acorn": "^8.15.0"
+  }
+}

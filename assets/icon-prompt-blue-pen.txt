@@ -1,0 +1,11 @@
+Edited with the built-in image_gen tool on 2026-10-30.
+Source: assets/adobe-mcp-icon-red-original.png
+
+Use case: precise-object-edit
+Asset type: Adobe MCP project app icon.
+Input image 1: edit target, the current red Adobe-inspired A icon.
+Primary request: Redesign this icon with a clear PEN motif and a blue color theme. Replace the large red ribbon letter A with one elegant, bold geometric fountain-pen nib emblem. The nib must be unmistakable: broad sculpted shoulders, tapering pointed tip, a clean central slit and small round breather hole. Its angular outline can subtly recall the original A, but the pen nib is the primary subject.
+Palette: rich sapphire and cobalt blue, restrained icy cyan rim light, a little cool silver on the nib edges; eliminate dominant red and orange. The rounded-square background is deep midnight navy with a soft blue undertone.
+Style: preserve the premium minimal 3D app-icon aesthetic, precise geometric construction, shallow bevels, satin metal finish, refined soft lighting and generous margins. A tiny seven-node connection motif can remain beneath the nib as a subtle blue/cyan detail, clearly secondary.
+Composition: preserve the square format, full rounded-square app tile, centered emblem and polished visual weight of the source.
+Constraints: no text, no words, no watermark, no mockup objects. Strong small-size legibility, one coherent pen icon, no extra pens or brushes.

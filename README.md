@@ -1,0 +1,167 @@
+# Adobe MCP Suite
+
+<p align="center">
+  <img src="assets/adobe-mcp-icon.png" width="180" alt="Blue pen nib and connection nodes on a navy app tile">
+</p>
+
+Seven independent [Model Context Protocol](https://modelcontextprotocol.io/) servers for Adobe creative applications. Each server has its own tool catalog, authenticated loopback bridge, and CEP panel. Connect only the applications you need.
+
+Built with JavaScript and the official MCP SDK. No API key or cloud backend is required.
+
+**Status:** early development. Protocol, transport, validation, and simulated host tests are available. Native workflows have **not yet been verified inside Adobe applications**. This release uses CEP/ExtendScript; a UXP adapter is not included.
+
+## Applications and tools
+
+| Application | Server entrypoint | Default port | Default tools | Main workflows |
+| --- | --- | --- | --- | --- |
+| Premiere Pro | `src/servers/premiere-pro.mjs` | 19101 | 14 | Project bins, media import, sequences, timeline clips, markers, export |
+| Photoshop | `src/servers/photoshop.mjs` | 19102 | 14 | Documents, layers, text, resizing, PSD and image export |
+| Media Encoder | `src/servers/media-encoder.mjs` | 19103 | 11 | Media and Dynamic Link queues, batch controls, formats |
+| Illustrator | `src/servers/illustrator.mjs` | 19104 | 15 | Documents, layers, artboards, shapes, text, AI/SVG/PNG export |
+| InDesign | `src/servers/indesign.mjs` | 19105 | 14 | Pages, text frames, image placement, INDD and PDF export |
+| After Effects | `src/servers/after-effects.mjs` | 19106 | 17 | Compositions, footage, layers, transforms, keyframes, rendering |
+| Audition | `src/servers/audition.mjs` | 19107 | 8 | Command discovery and invocation, waveform information, playhead |
+
+**93 tools are enabled by default.** Every server includes `connection_status` and `get_app_info`. Enabling the optional `run_script` adds one tool per server.
+
+See the [tool catalog](docs/TOOLS.md), [input schemas](docs/tools.json), and [architecture notes](docs/ARCHITECTURE.md).
+
+## Requirements
+
+- Node.js 22 or newer, with npm.
+- An Adobe application that supports CEP 10 or newer and the relevant ExtendScript APIs.
+- An MCP client supporting local stdio servers.
+- Windows for the included panel installer. macOS installation is manual and has not been verified.
+
+Adobe is transitioning extensions to UXP. Check [Adobe's migration guidance](https://helpx.adobe.com/au/creative-cloud/apps/integration-with-other-apps/manage-plugins/cep-uxp-plugin-transition.html) and your installed application's extension support. The broad host version range in the generated manifests is a loading rule, not a compatibility certification.
+
+## Quick start on Windows
+
+### 1. Install dependencies and prepare the panels
+
+```powershell
+git clone https://github.com/salehghotbani/adobe-mcp-suite.git
+cd adobe-mcp-suite
+npm ci
+npm run setup
+```
+
+In PowerShell environments that block `npm.ps1`, use `npm.cmd` in place of `npm`.
+
+Setup generates:
+
+- `build/cep/`: seven application-specific CEP panels.
+- `.adobe-mcp/config.json`: local ports and randomly generated bridge tokens.
+- `.adobe-mcp/mcp-servers.json`: MCP client configuration with absolute paths.
+
+Repeated setup preserves existing tokens. Run it again after moving the checkout to update absolute paths. Generated configuration and panels are ignored by Git because they contain local credentials.
+
+### 2. Install the CEP panels
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\install-cep.ps1 -EnableUnsigned
+```
+
+The installer copies the panels into `%APPDATA%\Adobe\CEP\extensions`. The explicit `-EnableUnsigned` option sets `PlayerDebugMode=1` under the current user's `HKCU\Software\Adobe\CSXS.10`, `CSXS.11`, and `CSXS.12` keys so unsigned development panels can load. Omit the option to leave those settings unchanged. Administrator privileges are not required.
+
+Install only one application with `-App photoshop`, or use any application ID from the entrypoint table. To update an existing installation, use `-Force`; the installer backs up the previous panel beside its installation directory.
+
+### 3. Connect your MCP client
+
+1. Restart the Adobe application.
+2. Open **Window > Extensions** or **Extensions (Legacy) > Adobe MCP — Application Name** and keep the panel open.
+3. Copy the desired server entries from `.adobe-mcp/mcp-servers.json` into your MCP client's configuration.
+4. Reconnect the client and call `connection_status`. A `connected: true` result confirms the matching panel is polling the bridge.
+
+The MCP client starts each server. Manual `npm run start:photoshop` and other `start:*` commands are useful for development, but do not run a second copy of the same server on its existing port.
+
+## Example tool inputs
+
+Create a Photoshop document with `create_document`:
+
+```json
+{
+  "name": "Poster",
+  "width": 1920,
+  "height": 1080,
+  "resolution": 72
+}
+```
+
+Export the active Photoshop document with `export_image`:
+
+```json
+{
+  "path": "C:\\Exports\\poster.png",
+  "format": "png",
+  "overwrite": false
+}
+```
+
+Output directories must already exist. File paths must be absolute and local. Save-as and export tools refuse existing files unless `overwrite: true` is supplied; save-in-place tools intentionally save the current file. Tool descriptions specify units and whether indexes start at zero or one. Most editing tools operate on the active document or sequence.
+
+Unicode parameters are preserved. Text rendering, fonts, shaping, and writing direction still depend on the host document settings.
+
+## Configuration
+
+Set these environment variables on an individual MCP server entry:
+
+| Variable | Purpose |
+| --- | --- |
+| `ADOBE_MCP_CONFIG` | Alternative configuration file; defaults to `.adobe-mcp/config.json` in the checkout |
+| `ADOBE_MCP_PORT` | Override the server's loopback port |
+| `ADOBE_MCP_TOKEN` | Override its bridge token; at least 32 characters |
+| `ADOBE_MCP_TIMEOUT_MS` | Operation deadline; defaults to `60000`, allowed range `100`–`3600000` |
+| `ADOBE_MCP_ALLOW_SCRIPTS` | Set exactly `true` to expose `run_script` with full ExtendScript permissions |
+
+For long renders, increase both the server deadline and your MCP client's tool timeout. To change a port or token permanently, edit `.adobe-mcp/config.json`, rerun setup, and reinstall the affected panel with `-Force`. Server environment overrides must match the installed panel's configuration.
+
+## Connection and execution behavior
+
+```text
+MCP client -- stdio --> application-specific MCP server
+                                 |
+                    HTTP + token on 127.0.0.1
+                                 |
+                          matching CEP panel
+                                 |
+                             evalScript
+                                 |
+                         Adobe ExtendScript DOM
+```
+
+Each bridge accepts only its application's host ID and panel lease. Commands execute serially. The panel can retry result delivery without repeating native execution. Logs go to stderr so stdout remains an MCP protocol channel.
+
+A queued operation that times out before dispatch is removed without execution. If a deadline expires after dispatch, Adobe may still be working; the bridge blocks additional dispatch until the outstanding result arrives. Inspect Adobe before retrying a modifying operation. If no result arrives, inspect the application and then restart the server and panel. Multi-step native edits do not provide a global transaction and may leave partial changes on failure.
+
+The bridge binds only to `127.0.0.1`, authenticates operational requests, and rejects web origins. Local credentials do not isolate the bridge from other software running under the same user account. Read the [security policy](SECURITY.md) before exposing arbitrary scripting or using sensitive documents.
+
+## Application limitations
+
+- **Audition:** APIs vary by version. Discover actual command IDs with `list_commands`, check them with `is_command_enabled`, and invoke them with `invoke_command`. Some commands open native dialogs. Playhead tools support waveform documents, not multitrack sessions.
+- **Media Encoder:** queue acceptance does not mean encoding completed. Batch state does not establish that every output succeeded.
+- **After Effects:** render templates are installed and localized by the host. Inspect resolved output paths and existing queue items before rendering.
+- **All applications:** codecs, fonts, presets, dialogs, and scripting preferences depend on the installed version. Verify workflows with disposable documents before using production projects.
+
+## Development and verification
+
+```sh
+npm ci
+npm run check
+npm test
+npm run catalog
+```
+
+`check` validates JavaScript syntax, checks for duplicate tool names, and parses every generated host script as ES3. Tests cover real MCP stdio connections for all seven servers, catalog isolation, schemas, authenticated HTTP transport, queue ordering, deadlines, Unicode, file checks, and the actual panel code running against a simulated Adobe host. Loopback HTTP must be allowed by the test environment.
+
+GitHub Actions runs the checks on Windows and Linux with Node.js 22 and 24. These checks do not replace native Adobe integration testing.
+
+Read [CONTRIBUTING.md](CONTRIBUTING.md) for the workflow and validation expectations. The [changelog](CHANGELOG.md) records release changes.
+
+## Project icon
+
+The [project icon](assets/adobe-mcp-icon.png) uses a sapphire pen nib, cyan edges, and seven connection nodes on a navy tile. It is included in all generated panels. The [design prompt](assets/icon-prompt-blue-pen.txt) and earlier design files are retained in `assets/`.
+
+## License and attribution
+
+Project source is distributed under the [MIT License](LICENSE). Third-party dependencies retain their own licenses; see [NOTICE](NOTICE). Adobe product names and trademarks belong to Adobe. This is an independent project and is not affiliated with or endorsed by Adobe.
