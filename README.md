@@ -201,11 +201,14 @@ src/
   apps/        Application-specific tool catalogs and host scripts
   bridge/      Authenticated HTTP transport and ExtendScript serialization
   catalog/     Generated documentation model
+  cli/         Terminal command parsing and application selection
   config/      Application metadata, project paths, version, and settings
+  installer/   Managed installation, bundles, updates and rollback
   mcp/         MCP registration, common tools, and input schemas
   servers/     Seven stable executable entrypoints
   setup/       Repeatable panel and client-configuration generation
 cep/           Panel HTML, CSS, JavaScript, and manifest template
+bin/           Public terminal executable
 scripts/       Development and installation commands
 tests/
   unit/        Configuration, catalog, and host-script checks
@@ -215,11 +218,13 @@ assets/branding/ Active icon, design prompt, and archived designs
 docs/          Architecture notes and generated tool reference
 ```
 
-Only `build/` and `.adobe-mcp/` are generated locally. The source layout does not change the server entrypoints used by existing MCP client configurations.
+`build/` and `.adobe-mcp/` contain generated development panels and local configuration. Release packaging uses ignored `dist/` and `.release-build/` directories. The source layout preserves the server entrypoints used by existing MCP client configurations.
 
 ## Project icon
 
 The [project icon](assets/branding/adobe-mcp-icon.png) uses a sapphire pen nib, cyan edges, and seven connection nodes on a navy tile. It is included in all generated panels. The [design prompt](assets/branding/blue-pen-prompt.txt) and earlier design files are retained in `assets/branding/`.
+
+Beside the icon, the [application badges](assets/branding/applications.svg) identify all seven programs by symbol and name: **Pr — Premiere Pro**, **Ps — Photoshop**, **Me — Media Encoder**, **Ai — Illustrator**, **Id — InDesign**, **Ae — After Effects**, and **Au — Audition**. These independently drawn letter badges identify applications; they do not certify Adobe version compatibility.
 
 ## License and attribution
 
