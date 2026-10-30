@@ -1,15 +1,19 @@
 # Implementation notes
 
+For operating instructions, use the [documentation index](README.md), [terminal reference](CLI.md), and [configuration guide](CONFIGURATION.md). This document describes the implementation and its trust boundaries.
+
 The seven stable entrypoints in `src/servers` load independent catalogs from `src/apps`. Shared responsibilities have explicit boundaries:
 
-| Directory     | Responsibility                                                                        |
-| ------------- | ------------------------------------------------------------------------------------- |
-| `src/bridge`  | Authenticated loopback queue and safe ExtendScript serialization                      |
-| `src/config`  | Application identifiers, connection validation, repository paths, and package version |
-| `src/mcp`     | MCP server registration, shared tools, reusable schemas, and tool definitions         |
-| `src/setup`   | Validated, repeatable generation of local panels and client configuration             |
-| `src/catalog` | Tool reference generation using the same definitions as the running servers           |
-| `cep`         | Runtime panel assets and the declarative manifest template                            |
+| Directory       | Responsibility                                                                        |
+| --------------- | ------------------------------------------------------------------------------------- |
+| `src/bridge`    | Authenticated loopback queue and safe ExtendScript serialization                      |
+| `src/config`    | Application identifiers, connection validation, repository paths, and package version |
+| `src/cli`       | Terminal command parsing, interactive application selection and management output     |
+| `src/installer` | Managed homes, verified portable bundles, panel ownership, updates and rollback       |
+| `src/mcp`       | MCP server registration, shared tools, reusable schemas, and tool definitions         |
+| `src/setup`     | Validated, repeatable generation of local panels and client configuration             |
+| `src/catalog`   | Tool reference generation using the same definitions as the running servers           |
+| `cep`           | Runtime panel assets and the declarative manifest template                            |
 
 New application tools are declared with `tool(name, description, shape, body, readOnly)`; the body must be ES3 and return plain data. Parameters are passed as a JSON literal in `p`, with `h.require`, `h.input` and `h.output` for preconditions. `npm run check` verifies formatting and parses every generated script as ES3. Shared tools are included in both runtime registration and generated documentation; arbitrary scripting is explicitly marked optional in the JSON catalog. `npm run catalog:check` detects stale documentation without rewriting it.
 
@@ -24,6 +28,43 @@ The CEP panel calls the native `window.__adobe_cep__` API directly, so it needs 
 Output paths require an existing parent and explicit overwrite for existing files. Save-in-place tools intentionally save the active file. These are checks at invocation/queue time, not a filesystem sandbox or an atomic lock: external processes can create output files afterwards, native dialogs and render queues retain their own behavior, and `run_script` has full host permissions. After Effects templates may alter the output extension, so the resolved module path is checked again when queued. Inspect render targets before executing an existing queue.
 
 MCP read-only annotations reflect actual tools; mutating tools conservatively carry `destructiveHint`. Insertion, imported media and text edits are changes to the open Adobe session. The server does not claim an application's undo stack provides atomic transactions.
+
+## Managed installation and launch
+
+`bin/adobe-mcp.mjs` loads the terminal commands in `src/cli/main.mjs`. The manager supports Windows/macOS CEP installation and Linux server-only installation. A portable ZIP contains `app/`, a platform-specific Node.js executable under `runtime/`, launchers and `release.json`. Its shared application code contains every catalog; selected app IDs determine which client entries and panels are generated.
+
+An installed home has this layout:
+
+```text
+<home>/
+  bin/                    Shell and Windows command launchers
+  bootstrap/              Stable Node executable, launcher.mjs and Node license
+  versions/<version>/
+    app/                  Application code, production dependencies and documentation
+    runtime/              Versioned Node executable and license
+    release.json          Platform, version and per-file SHA-256 manifest
+  connections.json        Private per-application ports and tokens
+  mcp-servers.json         Generated client entries for selected applications
+  state.json               Selection, active/previous version and update preferences
+  current                  Active version pointer
+  update-cache.json        Last update-check result, when a check has run
+```
+
+The bootstrap reads `current` and starts that version's Node executable and CLI. Generated MCP entries invoke the bootstrap with `run <app>`, so their command paths survive version changes. Managed `run` selects the home's connection file before importing the MCP server. Direct `src/servers` entrypoints keep the source-checkout workflow and its configurable connection path.
+
+Mutations use an exclusive installation lock. New versions are copied into a staging directory, verified and renamed into `versions/`. Credentials live outside those directories and are preserved across upgrades. Panel preparation shares `src/setup/panels.mjs` with source setup. The manager stages selected panels, checks ownership, backs up replaced panels and writes ownership markers naming the app and home.
+
+Version activation updates the generated client entries, pointer and state using atomic individual file writes. Handled commit failures restore the previous selection/configuration and panels. This is not a single filesystem transaction across all files or a guarantee against interrupted processes; `doctor` checks the pointer, bundle and configuration after recovery. Retained versions and panel backups support inspection and rollback. Removal also retains credentials and moves owned panels into backups.
+
+Rollback activates the previously active verified version using the current selection and connection settings. Running processes continue from their original version until restarted. The stable bootstrap executable is not overwritten during upgrades because Windows can keep it open; the versioned runtime changes with activation. See [runtime replacement guidance](INSTALLATION.md#updates-and-rollback).
+
+## Release integrity and update checks
+
+`src/installer/bundle.mjs` creates and validates per-file manifests. Update downloads are restricted to the repository's fixed HTTPS release paths and trusted GitHub redirect hosts. They have request and size limits. ZIP extraction rejects unsafe paths and limits expanded sizes. Verification checks the archive checksum, optional GitHub digest, platform/architecture, package version and every declared file before activation.
+
+`src/installer/updates.mjs` starts an asynchronous check when a managed server runs, then examines the shared persisted cache hourly. The saved interval defaults to 24 hours, including cached network failures. Background checks are notification-only, use stderr, and can be disabled through preferences or the server environment. The explicit `update` command downloads and installs a newer stable release independently of notification preferences. Direct source servers do not start this monitor.
+
+Release builds run tests and portable installation/MCP smoke checks on five native runner targets. Publishing verifies that the version tag matches the package and belongs to `main`, assembles all archives and supporting assets, calculates `SHA256SUMS`, and publishes only after uploading the complete draft. Build jobs have read permissions; the publication job has contents-write permission. Release checksums detect corruption and do not provide publisher authentication independently of the GitHub repository account.
 
 ## Sources
 
@@ -45,4 +86,4 @@ MCP read-only annotations reflect actual tools; mutating tools conservatively ca
 
 ## Remaining host verification
 
-The repository tests exercise protocol and transport behavior against simulated native objects. Before using production projects, install each panel in the specific Adobe version, verify `connection_status` and `get_app_info`, and exercise a disposable file with each workflow. Verify localized output template names, fonts, codecs, presets and any host dialogs. A wide manifest version range is a loading rule, not a certification matrix. No UXP adapter, cloud service, installer signing or Adobe Marketplace publication is included.
+The repository tests exercise real MCP/HTTP transports, simulated native objects, installer behavior and update integrity. Release smoke checks verify installation and actual MCP stdio from packaged binaries on each target; they do not run the Adobe applications. Before using production projects, install each panel in the specific Adobe version, verify `connection_status` and `get_app_info`, and exercise a disposable file with each workflow. Verify localized output template names, fonts, codecs, presets and any host dialogs. A wide manifest version range is a loading rule, not a certification matrix. No UXP adapter, cloud service, installer signing or Adobe Marketplace publication is included.

@@ -9,6 +9,8 @@ Seven independent [Model Context Protocol](https://modelcontextprotocol.io/) ser
 
 Built with JavaScript and the official MCP SDK. No API key or cloud backend is required.
 
+Start with the [documentation index](docs/README.md), [installation guide](docs/INSTALLATION.md), [terminal command reference](docs/CLI.md), [MCP configuration](docs/CONFIGURATION.md), and [troubleshooting](docs/TROUBLESHOOTING.md).
+
 **Status:** early development. Protocol, transport, validation, and simulated host tests are available. Native workflows have **not yet been verified inside Adobe applications**. This release uses CEP/ExtendScript; a UXP adapter is not included.
 
 ## Applications and tools
@@ -51,10 +53,15 @@ Download the matching ZIP from [Releases](https://github.com/salehghotbani/adobe
 # macOS: inside the extracted bundle
 chmod +x ./adobe-mcp ./runtime/node
 ./adobe-mcp install --apps ps,ai --enable-unsigned
-# Linux: use --server-only in place of --enable-unsigned
 ```
 
-Omit `--apps` for an interactive selection, or use `--apps all`. The installer prints the stable launcher path and the MCP client configuration file. Add the reported `bin` directory to PATH and import `mcp-servers.json` into your MCP client. Restart Adobe and open the selected CEP panels. The explicit `--enable-unsigned` option enables current-user development panel loading.
+```sh
+# Linux: inside the extracted bundle; native Adobe hosts are unavailable
+chmod +x ./adobe-mcp ./runtime/node
+./adobe-mcp install --apps ps,ai --server-only
+```
+
+Omit `--apps` for an interactive selection, or use `--apps all`. The installer prints the stable launcher path and the MCP client configuration file. Add the reported `bin` directory to PATH and import `mcp-servers.json` into your MCP client. On Windows/macOS, restart Adobe and open the selected CEP panels. The explicit `--enable-unsigned` option enables current-user development panel loading. Each ZIP contains shared server code; app selection determines the generated server entries and installed panels.
 
 ```sh
 adobe-mcp install --apps ae,au    # Add tool sets; preserve existing selections
@@ -71,6 +78,8 @@ Automatic update checks run in the background while a managed MCP server is runn
 See the complete [installation, platform, update and rollback guide](docs/INSTALLATION.md) for bootstrap scripts, custom locations, offline use, backups, retained runtimes and unsigned panel settings. Release assets include five portable ZIPs, optional PowerShell/POSIX bootstrap installers, source/npm packaging, checksums and license notices.
 
 ## Source checkout on Windows (development)
+
+This workflow runs servers directly from the checkout and uses `.adobe-mcp/config.json`. The terminal manager uses its own installation home and `connections.json`; see [configuration modes](docs/CONFIGURATION.md#managed-installation-and-source-checkout). Use the installer that owns your panels. Keep development panels separate from managed installations.
 
 ### 1. Install dependencies and prepare the panels
 
@@ -139,17 +148,21 @@ Unicode parameters are preserved. Text rendering, fonts, shaping, and writing di
 
 ## Configuration
 
+Managed installations load `<installation home>/connections.json` and export `<installation home>/mcp-servers.json`. Direct source servers default to `<checkout>/.adobe-mcp/config.json`. Managed `run` explicitly selects its home's connection file. See the [configuration guide](docs/CONFIGURATION.md) for complete precedence rules and copyable MCP client entries.
+
 Set these environment variables on an individual MCP server entry:
 
-| Variable                  | Purpose                                                                              |
-| ------------------------- | ------------------------------------------------------------------------------------ |
-| `ADOBE_MCP_CONFIG`        | Alternative configuration file; defaults to `.adobe-mcp/config.json` in the checkout |
-| `ADOBE_MCP_PORT`          | Override the server's loopback port                                                  |
-| `ADOBE_MCP_TOKEN`         | Override its bridge token; 32–1024 visible ASCII characters                          |
-| `ADOBE_MCP_TIMEOUT_MS`    | Operation deadline; defaults to `60000`, allowed range `100`–`3600000`               |
-| `ADOBE_MCP_ALLOW_SCRIPTS` | Set exactly `true` to expose `run_script` with full ExtendScript permissions         |
+| Variable                    | Purpose                                                                                                    |
+| --------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `ADOBE_MCP_CONFIG`          | Alternative connection file for direct source servers; managed `run` selects its own home                  |
+| `ADOBE_MCP_PORT`            | Override the server's loopback port                                                                        |
+| `ADOBE_MCP_TOKEN`           | Override its bridge token; 32–1024 visible ASCII characters                                                |
+| `ADOBE_MCP_TIMEOUT_MS`      | Operation deadline; defaults to `60000`, allowed range `100`–`3600000`                                     |
+| `ADOBE_MCP_ALLOW_SCRIPTS`   | Set exactly `true` to expose `run_script` with full ExtendScript permissions                               |
+| `ADOBE_MCP_NO_UPDATE_CHECK` | Set exactly `1` to suppress background checks in a managed server                                          |
+| `ADOBE_MCP_HOME`            | Installation home for CLI invocation; `--root` takes precedence; installed launchers select their own home |
 
-For long renders, increase both the server deadline and your MCP client's tool timeout. To change a port or token permanently, edit `.adobe-mcp/config.json`, rerun setup, and reinstall the affected panel with `-Force`. Server environment overrides must match the installed panel's configuration.
+For long operations, increase both the server deadline and your MCP client's tool timeout. To change a saved port or token, stop the affected server and panel, edit the connection file for the workflow you use, then regenerate matching panels. Managed installations use `adobe-mcp install --apps <app>`; source checkouts use setup and panel reinstallation. Follow the [port and token change procedure](docs/CONFIGURATION.md#change-a-saved-port-or-rotate-a-token). Server environment overrides must match the panel's settings.
 
 ## Connection and execution behavior
 
@@ -214,8 +227,9 @@ tests/
   unit/        Configuration, catalog, and host-script checks
   integration/ MCP, bridge, panel, and setup workflows
   helpers/     Disposable test fixtures
+  windows/     PowerShell bootstrap regression test
 assets/branding/ Active icon, design prompt, and archived designs
-docs/          Architecture notes and generated tool reference
+docs/          Installation, CLI, configuration, troubleshooting and tool reference
 ```
 
 `build/` and `.adobe-mcp/` contain generated development panels and local configuration. Release packaging uses ignored `dist/` and `.release-build/` directories. The source layout preserves the server entrypoints used by existing MCP client configurations.

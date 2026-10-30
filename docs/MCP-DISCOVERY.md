@@ -1,6 +1,6 @@
 # MCP resources, prompts, and expanded workflows
 
-Each of the seven servers exposes application-specific tools, two resources, and two prompts over the same stdio connection. Existing MCP client configurations continue to work. Reconnect the client after updating the server checkout so it can discover the expanded capabilities.
+Each of the seven servers exposes application-specific tools, two resources, and two prompts over the same stdio connection. Existing source entrypoints continue to work. Managed installations export selected entries through `adobe-mcp config`; see [MCP client configuration](CONFIGURATION.md). Reconnect the client after an update so it can discover the current capabilities. The [command reference](CLI.md) covers installation and version management; the resources and prompts below are features accessed through an MCP client.
 
 The current default catalog contains **131 tools**. Enabling arbitrary scripting adds one optional tool per server, bringing the total across all seven servers to 138.
 

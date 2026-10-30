@@ -4,6 +4,8 @@ Terminal installation and version management for seven independent Adobe MCP ser
 
 This patch fixes the Windows bootstrap's handling of GitHub's binary checksum responses. Existing v0.2.0 installations can use `adobe-mcp update`; new users should download v0.2.1.
 
+Read the [current documentation](https://github.com/salehghotbani/adobe-mcp-suite/blob/main/docs/README.md) for the expanded terminal reference, MCP configuration examples and troubleshooting. Documents inside release archives remain snapshots of the release tag.
+
 - Select Premiere Pro (Pr), Photoshop (Ps), Media Encoder (Me), Illustrator (Ai), InDesign (Id), After Effects (Ae), Audition (Au), or any combination.
 - Portable Windows x64, macOS Intel/Apple Silicon, and Linux x64/ARM64 ZIPs include Node.js and production dependencies. Linux supports server-only mode.
 - Incremental tool installation, selective removal, stable MCP client configuration, preserved tokens, verified updates and rollback.
