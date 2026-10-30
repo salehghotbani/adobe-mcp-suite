@@ -12,19 +12,21 @@ Built with JavaScript and the official MCP SDK. No API key or cloud backend is r
 
 ## Applications and tools
 
-| Application   | Server entrypoint               | Default port | Default tools | Main workflows                                                         |
-| ------------- | ------------------------------- | ------------ | ------------- | ---------------------------------------------------------------------- |
-| Premiere Pro  | `src/servers/premiere-pro.mjs`  | 19101        | 14            | Project bins, media import, sequences, timeline clips, markers, export |
-| Photoshop     | `src/servers/photoshop.mjs`     | 19102        | 14            | Documents, layers, text, resizing, PSD and image export                |
-| Media Encoder | `src/servers/media-encoder.mjs` | 19103        | 11            | Media and Dynamic Link queues, batch controls, formats                 |
-| Illustrator   | `src/servers/illustrator.mjs`   | 19104        | 15            | Documents, layers, artboards, shapes, text, AI/SVG/PNG export          |
-| InDesign      | `src/servers/indesign.mjs`      | 19105        | 14            | Pages, text frames, image placement, INDD and PDF export               |
-| After Effects | `src/servers/after-effects.mjs` | 19106        | 17            | Compositions, footage, layers, transforms, keyframes, rendering        |
-| Audition      | `src/servers/audition.mjs`      | 19107        | 8             | Command discovery and invocation, waveform information, playhead       |
+| Application   | Server entrypoint               | Default port | Default tools | Main workflows                                                                  |
+| ------------- | ------------------------------- | ------------ | ------------- | ------------------------------------------------------------------------------- |
+| Premiere Pro  | `src/servers/premiere-pro.mjs`  | 19101        | 20            | Sequence settings, ranges, clip enablement, media relinking, markers and export |
+| Photoshop     | `src/servers/photoshop.mjs`     | 19102        | 20            | Documents, layer/text editing, duplication, cropping, resizing and image export |
+| Media Encoder | `src/servers/media-encoder.mjs` | 19103        | 15            | Source metadata, media/image/stitch queues, previews and batch controls         |
+| Illustrator   | `src/servers/illustrator.mjs`   | 19104        | 21            | Selection, layers, artboards, shapes, linked images and AI/SVG/PNG/PDF output   |
+| InDesign      | `src/servers/indesign.mjs`      | 19105        | 19            | Documents, pages, text frames, linked assets and INDD/PDF/IDML output           |
+| After Effects | `src/servers/after-effects.mjs` | 19106        | 25            | Compositions, layer timing, effects, keyframes, markers and render templates    |
+| Audition      | `src/servers/audition.mjs`      | 19107        | 11            | Command batches, API discovery, waveform information and relative navigation    |
 
-**93 tools are enabled by default.** Every server includes `connection_status` and `get_app_info`. Enabling the optional `run_script` adds one tool per server.
+**131 tools are enabled by default.** Every server includes `connection_status` and `get_app_info`. Enabling the optional `run_script` adds one tool per server.
 
-See the [tool catalog](docs/TOOLS.md), [input schemas](docs/tools.json), and [architecture notes](docs/ARCHITECTURE.md).
+Every server also provides two MCP resources for its catalog and workflow guide, and two prompts for workflow planning and connection diagnosis. These discovery features work without an Adobe connection and do not execute native operations.
+
+See the [tool catalog](docs/TOOLS.md), [input schemas](docs/tools.json), [MCP resources and prompts](docs/MCP-DISCOVERY.md), and [architecture notes](docs/ARCHITECTURE.md).
 
 ## Requirements
 

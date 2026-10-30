@@ -220,5 +220,93 @@ export const tools = [
   d.exportDocument(f, ExportType.SAVEFORWEB, o);
   return { path: f.fsName, format: p.format };
 `
+  ),
+  tool(
+    'get_document_info',
+    'Read active Photoshop document dimensions, color mode, bit depth and active layer.',
+    {},
+    doc +
+      `
+  return {
+    id: d.id,
+    name: d.name,
+    width: d.width.as('px'),
+    height: d.height.as('px'),
+    resolution: d.resolution,
+    mode: String(d.mode),
+    bitsPerChannel: String(d.bitsPerChannel),
+    activeLayerId: d.activeLayer.id
+  };
+`,
+    true
+  ),
+  tool(
+    'duplicate_document',
+    'Duplicate the active document, preserve its layers, and activate the copy.',
+    { name: text },
+    doc +
+      `
+  var copy = d.duplicate(p.name, false);
+  return { id: copy.id, name: copy.name };
+`
+  ),
+  tool(
+    'duplicate_layer',
+    'Duplicate a layer or group by ID within the active document.',
+    { layerId: z.number().int().positive(), name: text.optional() },
+    layer +
+      `
+  var copy = l.duplicate();
+  if (p.name !== undefined) copy.name = p.name;
+  return { id: copy.id, name: copy.name };
+`
+  ),
+  tool(
+    'translate_layer',
+    'Move a layer or group by a relative offset in pixels, independent of ruler preferences.',
+    { layerId: z.number().int().positive(), dx: z.number(), dy: z.number() },
+    layer +
+      `
+  h.require(!l.allLocked, 'The layer is locked.');
+  l.translate(UnitValue(p.dx, 'px'), UnitValue(p.dy, 'px'));
+  return { id: l.id, dx: p.dx, dy: p.dy };
+`
+  ),
+  tool(
+    'set_text_layer',
+    'Replace text and optionally its font size in points, using a text layer ID. Empty text clears the layer.',
+    {
+      layerId: z.number().int().positive(),
+      contents: z.string().max(10000),
+      size: z.number().positive().max(1296).optional()
+    },
+    layer +
+      `
+  h.require(l.typename === 'ArtLayer' && l.kind === LayerKind.TEXT, 'Layer is not a text layer.');
+  h.require(!l.allLocked, 'The layer is locked.');
+  l.textItem.contents = p.contents;
+  if (p.size !== undefined) l.textItem.size = UnitValue(p.size, 'pt');
+  return { id: l.id, contents: l.textItem.contents };
+`
+  ),
+  tool(
+    'crop_document',
+    'Crop the active document to [left,top,right,bottom] pixel bounds inside the current canvas.',
+    {
+      bounds: z
+        .tuple([z.number().min(0), z.number().min(0), z.number().positive(), z.number().positive()])
+        .refine((v) => v[2] > v[0] && v[3] > v[1], 'Require right > left and bottom > top')
+    },
+    doc +
+      `
+  h.require(
+    p.bounds[2] <= d.width.as('px') && p.bounds[3] <= d.height.as('px'),
+    'Crop bounds exceed the canvas.'
+  );
+  var bounds = [];
+  for (var i = 0; i < 4; i++) bounds.push(UnitValue(p.bounds[i], 'px'));
+  d.crop(bounds);
+  return { width: d.width.as('px'), height: d.height.as('px') };
+`
   )
 ];

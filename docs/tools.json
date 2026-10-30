@@ -303,6 +303,127 @@
       "enabledByDefault": true
     },
     {
+      "name": "get_sequence_settings",
+      "description": "Read active sequence video dimensions, timebase, frame duration, playhead and in/out points.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "enabledByDefault": true
+    },
+    {
+      "name": "list_markers",
+      "description": "Read a paginated list of active sequence markers, including GUIDs and start/end times in seconds.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "offset": { "default": 0, "type": "integer", "minimum": 0, "maximum": 9007199254740991 },
+          "limit": { "default": 100, "type": "integer", "minimum": 1, "maximum": 500 }
+        },
+        "required": ["offset", "limit"],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "enabledByDefault": true
+    },
+    {
+      "name": "set_playhead",
+      "description": "Move the active sequence playhead to an absolute time in seconds.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": { "seconds": { "type": "number", "minimum": 0 } },
+        "required": ["seconds"],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "enabledByDefault": true
+    },
+    {
+      "name": "set_sequence_range",
+      "description": "Set active sequence in/out points in seconds; end must be greater than start.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "start": { "type": "number", "minimum": 0 },
+          "end": { "type": "number", "exclusiveMinimum": 0 }
+        },
+        "required": ["start", "end"],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "enabledByDefault": true
+    },
+    {
+      "name": "set_clip_enabled",
+      "description": "Enable or disable a timeline clip. Track and clip indexes start at zero; requires TrackItem.disabled support.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "kind": { "default": "video", "type": "string", "enum": ["video", "audio"] },
+          "trackIndex": { "type": "integer", "minimum": 0, "maximum": 9007199254740991 },
+          "clipIndex": { "type": "integer", "minimum": 0, "maximum": 9007199254740991 },
+          "enabled": { "type": "boolean" }
+        },
+        "required": ["kind", "trackIndex", "clipIndex", "enabled"],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "enabledByDefault": true
+    },
+    {
+      "name": "relink_media",
+      "description": "Replace a project item source file by node ID. All clips referencing that item are affected.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "nodeId": { "type": "string", "minLength": 1, "maxLength": 10000 },
+          "path": { "type": "string", "minLength": 1, "maxLength": 32767 }
+        },
+        "required": ["nodeId", "path"],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "enabledByDefault": true
+    },
+    {
       "name": "run_script",
       "description": "Execute arbitrary ExtendScript with full Adobe scripting permissions. Return a plain JSON-compatible value using return. No browser or Node APIs.",
       "inputSchema": {
@@ -611,6 +732,137 @@
       "enabledByDefault": true
     },
     {
+      "name": "get_document_info",
+      "description": "Read active Photoshop document dimensions, color mode, bit depth and active layer.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "enabledByDefault": true
+    },
+    {
+      "name": "duplicate_document",
+      "description": "Duplicate the active document, preserve its layers, and activate the copy.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": { "name": { "type": "string", "minLength": 1, "maxLength": 10000 } },
+        "required": ["name"],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "enabledByDefault": true
+    },
+    {
+      "name": "duplicate_layer",
+      "description": "Duplicate a layer or group by ID within the active document.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "layerId": { "type": "integer", "exclusiveMinimum": 0, "maximum": 9007199254740991 },
+          "name": { "type": "string", "minLength": 1, "maxLength": 10000 }
+        },
+        "required": ["layerId"],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "enabledByDefault": true
+    },
+    {
+      "name": "translate_layer",
+      "description": "Move a layer or group by a relative offset in pixels, independent of ruler preferences.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "layerId": { "type": "integer", "exclusiveMinimum": 0, "maximum": 9007199254740991 },
+          "dx": { "type": "number" },
+          "dy": { "type": "number" }
+        },
+        "required": ["layerId", "dx", "dy"],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "enabledByDefault": true
+    },
+    {
+      "name": "set_text_layer",
+      "description": "Replace text and optionally its font size in points, using a text layer ID. Empty text clears the layer.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "layerId": { "type": "integer", "exclusiveMinimum": 0, "maximum": 9007199254740991 },
+          "contents": { "type": "string", "maxLength": 10000 },
+          "size": { "type": "number", "exclusiveMinimum": 0, "maximum": 1296 }
+        },
+        "required": ["layerId", "contents"],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "enabledByDefault": true
+    },
+    {
+      "name": "crop_document",
+      "description": "Crop the active document to [left,top,right,bottom] pixel bounds inside the current canvas.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "bounds": {
+            "type": "array",
+            "prefixItems": [
+              { "type": "number", "minimum": 0 },
+              { "type": "number", "minimum": 0 },
+              { "type": "number", "exclusiveMinimum": 0 },
+              { "type": "number", "exclusiveMinimum": 0 }
+            ],
+            "items": false,
+            "minItems": 4,
+            "maxItems": 4
+          }
+        },
+        "required": ["bounds"],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "enabledByDefault": true
+    },
+    {
       "name": "run_script",
       "description": "Execute arbitrary ExtendScript with full Adobe scripting permissions. Return a plain JSON-compatible value using return. No browser or Node APIs.",
       "inputSchema": {
@@ -831,6 +1083,114 @@
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {},
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "enabledByDefault": true
+    },
+    {
+      "name": "inspect_source",
+      "description": "Inspect readable primitive source-media metadata exposed by the installed AME version. Property names are discovered through reflection.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "source": { "type": "string", "minLength": 1, "maxLength": 32767 },
+          "offset": { "default": 0, "type": "integer", "minimum": 0, "maximum": 9007199254740991 },
+          "limit": { "default": 100, "type": "integer", "minimum": 1, "maximum": 500 }
+        },
+        "required": ["source", "offset", "limit"],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "enabledByDefault": true
+    },
+    {
+      "name": "add_image_sequence",
+      "description": "Queue an image sequence using a folder and one image in that folder. Other images with the same extension may be included by AME.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "folder": { "type": "string", "minLength": 1, "maxLength": 32767 },
+          "image": { "type": "string", "minLength": 1, "maxLength": 32767 },
+          "preset": { "type": "string", "minLength": 1, "maxLength": 32767 },
+          "path": { "type": "string", "minLength": 1, "maxLength": 32767 },
+          "overwrite": {
+            "default": false,
+            "description": "Explicitly permit replacing an existing output file",
+            "type": "boolean"
+          }
+        },
+        "required": ["folder", "image", "preset", "path", "overwrite"],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "enabledByDefault": true
+    },
+    {
+      "name": "stitch_files",
+      "description": "Queue multiple media files as one stitched output in the supplied order. Source paths cannot contain semicolons.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "sources": {
+            "minItems": 2,
+            "maxItems": 50,
+            "type": "array",
+            "items": { "type": "string", "minLength": 1, "maxLength": 32767 }
+          },
+          "preset": { "type": "string", "minLength": 1, "maxLength": 32767 },
+          "path": { "type": "string", "minLength": 1, "maxLength": 32767 },
+          "overwrite": {
+            "default": false,
+            "description": "Explicitly permit replacing an existing output file",
+            "type": "boolean"
+          },
+          "format": { "default": "", "type": "string", "maxLength": 100 }
+        },
+        "required": ["sources", "preset", "path", "overwrite", "format"],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "enabledByDefault": true
+    },
+    {
+      "name": "save_batch_preview",
+      "description": "Write the current batch preview to a TIFF file. A current preview must be available.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "path": { "type": "string", "minLength": 1, "maxLength": 32767 },
+          "overwrite": {
+            "default": false,
+            "description": "Explicitly permit replacing an existing output file",
+            "type": "boolean"
+          }
+        },
+        "required": ["path", "overwrite"],
         "additionalProperties": false
       },
       "annotations": {
@@ -1200,6 +1560,155 @@
       "enabledByDefault": true
     },
     {
+      "name": "get_selection",
+      "description": "Read selected Illustrator objects with bounded text previews. Text selections are supported.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "offset": { "default": 0, "type": "integer", "minimum": 0, "maximum": 9007199254740991 },
+          "limit": { "default": 100, "type": "integer", "minimum": 1, "maximum": 500 }
+        },
+        "required": ["offset", "limit"],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "enabledByDefault": true
+    },
+    {
+      "name": "set_layer",
+      "description": "Rename, show, hide, lock or unlock a top-level Illustrator layer by one-based index.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "layerIndex": { "type": "integer", "minimum": 1, "maximum": 9007199254740991 },
+          "name": { "type": "string", "minLength": 1, "maxLength": 10000 },
+          "visible": { "type": "boolean" },
+          "locked": { "type": "boolean" }
+        },
+        "required": ["layerIndex"],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "enabledByDefault": true
+    },
+    {
+      "name": "activate_artboard",
+      "description": "Activate an artboard by one-based index.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "artboardIndex": { "type": "integer", "minimum": 1, "maximum": 9007199254740991 }
+        },
+        "required": ["artboardIndex"],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "enabledByDefault": true
+    },
+    {
+      "name": "add_ellipse",
+      "description": "Draw a filled ellipse. Position and dimensions are points; RGB components range from zero to one.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "left": { "type": "number" },
+          "top": { "type": "number" },
+          "width": { "type": "number", "exclusiveMinimum": 0 },
+          "height": { "type": "number", "exclusiveMinimum": 0 },
+          "color": {
+            "default": [0.1, 0.4, 1],
+            "type": "array",
+            "prefixItems": [
+              { "type": "number", "minimum": 0, "maximum": 1 },
+              { "type": "number", "minimum": 0, "maximum": 1 },
+              { "type": "number", "minimum": 0, "maximum": 1 }
+            ],
+            "items": false,
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "name": { "default": "MCP Ellipse", "type": "string", "minLength": 1, "maxLength": 10000 }
+        },
+        "required": ["left", "top", "width", "height", "color", "name"],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "enabledByDefault": true
+    },
+    {
+      "name": "place_image",
+      "description": "Place a linked local image at [x,y] points using its natural size.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "path": { "type": "string", "minLength": 1, "maxLength": 32767 },
+          "x": { "default": 0, "type": "number" },
+          "y": { "default": 0, "type": "number" },
+          "name": { "default": "MCP Image", "type": "string", "minLength": 1, "maxLength": 10000 }
+        },
+        "required": ["path", "x", "y", "name"],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "enabledByDefault": true
+    },
+    {
+      "name": "save_as_pdf",
+      "description": "Save the active Illustrator document as PDF. This changes its current file association.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "path": { "type": "string", "minLength": 1, "maxLength": 32767 },
+          "overwrite": {
+            "default": false,
+            "description": "Explicitly permit replacing an existing output file",
+            "type": "boolean"
+          },
+          "preserveEditability": { "default": true, "type": "boolean" }
+        },
+        "required": ["path", "overwrite", "preserveEditability"],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "enabledByDefault": true
+    },
+    {
       "name": "run_script",
       "description": "Execute arbitrary ExtendScript with full Adobe scripting permissions. Return a plain JSON-compatible value using return. No browser or Node APIs.",
       "inputSchema": {
@@ -1515,6 +2024,109 @@
             "type": "boolean"
           },
           "preset": { "type": "string", "minLength": 1, "maxLength": 10000 }
+        },
+        "required": ["path", "overwrite"],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "enabledByDefault": true
+    },
+    {
+      "name": "activate_document",
+      "description": "Activate an open InDesign document by its document ID.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "documentId": { "type": "integer", "exclusiveMinimum": 0, "maximum": 9007199254740991 }
+        },
+        "required": ["documentId"],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "enabledByDefault": true
+    },
+    {
+      "name": "get_document_info",
+      "description": "Read active document identity, page/story/link counts, saved state and unsaved changes.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "enabledByDefault": true
+    },
+    {
+      "name": "list_links",
+      "description": "List placed-file links, IDs, paths and native status values in the active document.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "offset": { "default": 0, "type": "integer", "minimum": 0, "maximum": 9007199254740991 },
+          "limit": { "default": 100, "type": "integer", "minimum": 1, "maximum": 500 }
+        },
+        "required": ["offset", "limit"],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "enabledByDefault": true
+    },
+    {
+      "name": "update_link",
+      "description": "Refresh one placed-file link by ID. The linked source must still exist.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "linkId": { "type": "integer", "exclusiveMinimum": 0, "maximum": 9007199254740991 }
+        },
+        "required": ["linkId"],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "enabledByDefault": true
+    },
+    {
+      "name": "export_idml",
+      "description": "Export an IDML interchange copy without changing the current INDD file association.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "path": { "type": "string", "minLength": 1, "maxLength": 32767 },
+          "overwrite": {
+            "default": false,
+            "description": "Explicitly permit replacing an existing output file",
+            "type": "boolean"
+          }
         },
         "required": ["path", "overwrite"],
         "additionalProperties": false
@@ -1928,6 +2540,195 @@
       "enabledByDefault": true
     },
     {
+      "name": "get_composition",
+      "description": "Read composition size, frame rate, duration, layer count and work area by project item index.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "compIndex": { "type": "integer", "minimum": 1, "maximum": 9007199254740991 }
+        },
+        "required": ["compIndex"],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "enabledByDefault": true
+    },
+    {
+      "name": "set_work_area",
+      "description": "Set a composition work area in seconds. Duration must be at least one frame and fit inside the composition.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "compIndex": { "type": "integer", "minimum": 1, "maximum": 9007199254740991 },
+          "start": { "type": "number", "minimum": 0 },
+          "duration": { "type": "number", "exclusiveMinimum": 0 }
+        },
+        "required": ["compIndex", "start", "duration"],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "enabledByDefault": true
+    },
+    {
+      "name": "add_composition_marker",
+      "description": "Add a composition marker at seconds; an existing marker at that time requires replaceExisting=true.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "compIndex": { "type": "integer", "minimum": 1, "maximum": 9007199254740991 },
+          "time": { "type": "number", "minimum": 0 },
+          "comment": { "type": "string", "minLength": 1, "maxLength": 10000 },
+          "duration": { "default": 0, "type": "number", "minimum": 0 },
+          "replaceExisting": { "default": false, "type": "boolean" }
+        },
+        "required": ["compIndex", "time", "comment", "duration", "replaceExisting"],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "enabledByDefault": true
+    },
+    {
+      "name": "duplicate_layer",
+      "description": "Duplicate a layer within a composition and optionally rename the copy.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "compIndex": { "type": "integer", "minimum": 1, "maximum": 9007199254740991 },
+          "layerIndex": { "type": "integer", "minimum": 1, "maximum": 9007199254740991 },
+          "name": { "type": "string", "minLength": 1, "maxLength": 10000 }
+        },
+        "required": ["compIndex", "layerIndex"],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "enabledByDefault": true
+    },
+    {
+      "name": "set_layer_timing",
+      "description": "Set layer in/out points in composition seconds and optionally its start-time offset.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "compIndex": { "type": "integer", "minimum": 1, "maximum": 9007199254740991 },
+          "layerIndex": { "type": "integer", "minimum": 1, "maximum": 9007199254740991 },
+          "inPoint": { "type": "number", "minimum": 0 },
+          "outPoint": { "type": "number", "exclusiveMinimum": 0 },
+          "startTime": { "type": "number" }
+        },
+        "required": ["compIndex", "layerIndex", "inPoint", "outPoint"],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "enabledByDefault": true
+    },
+    {
+      "name": "add_effect",
+      "description": "Add an effect by its stable Adobe match name to a layer. Unsupported effects are rejected before insertion.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "compIndex": { "type": "integer", "minimum": 1, "maximum": 9007199254740991 },
+          "layerIndex": { "type": "integer", "minimum": 1, "maximum": 9007199254740991 },
+          "matchName": { "type": "string", "minLength": 1, "maxLength": 10000 }
+        },
+        "required": ["compIndex", "layerIndex", "matchName"],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "enabledByDefault": true
+    },
+    {
+      "name": "set_transform_keyframe",
+      "description": "Set a 2D transform keyframe. Position/scale use two numbers; rotation/opacity use one number.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "compIndex": { "type": "integer", "minimum": 1, "maximum": 9007199254740991 },
+          "layerIndex": { "type": "integer", "minimum": 1, "maximum": 9007199254740991 },
+          "time": { "type": "number", "minimum": 0 },
+          "property": { "type": "string", "enum": ["position", "scale", "rotation", "opacity"] },
+          "value": {
+            "anyOf": [
+              { "type": "number" },
+              {
+                "type": "array",
+                "prefixItems": [{ "type": "number" }, { "type": "number" }],
+                "items": false,
+                "minItems": 2,
+                "maxItems": 2
+              }
+            ]
+          }
+        },
+        "required": ["compIndex", "layerIndex", "time", "property", "value"],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "enabledByDefault": true
+    },
+    {
+      "name": "get_render_templates",
+      "description": "Read Render Settings and Output Module template names from an existing render-queue item.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "queueIndex": { "type": "integer", "minimum": 1, "maximum": 9007199254740991 }
+        },
+        "required": ["queueIndex"],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "enabledByDefault": true
+    },
+    {
       "name": "run_script",
       "description": "Execute arbitrary ExtendScript with full Adobe scripting permissions. Return a plain JSON-compatible value using return. No browser or Node APIs.",
       "inputSchema": {
@@ -2096,6 +2897,77 @@
         "readOnlyHint": true,
         "destructiveHint": false,
         "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "enabledByDefault": true
+    },
+    {
+      "name": "seek_playhead",
+      "description": "Move the waveform playhead by a relative number of seconds. Optional clamping keeps it within waveform bounds.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "offsetSeconds": { "type": "number" },
+          "clamp": { "default": false, "type": "boolean" }
+        },
+        "required": ["offsetSeconds", "clamp"],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "enabledByDefault": true
+    },
+    {
+      "name": "get_api_member",
+      "description": "Read type, help and argument metadata for one reflected Audition property or method without invoking it.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "target": {
+            "default": "application",
+            "type": "string",
+            "enum": ["application", "active_document"]
+          },
+          "name": { "type": "string", "minLength": 1, "maxLength": 10000 }
+        },
+        "required": ["target", "name"],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "enabledByDefault": true
+    },
+    {
+      "name": "invoke_commands",
+      "description": "Invoke up to 20 discovered command IDs in order. Stops on the first disabled or failing command and returns completed commands; index values start at zero. Avoid commands that open dialogs.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "commandIds": {
+            "minItems": 1,
+            "maxItems": 20,
+            "type": "array",
+            "items": { "type": "string", "minLength": 1, "maxLength": 10000 }
+          }
+        },
+        "required": ["commandIds"],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
         "openWorldHint": false
       },
       "enabledByDefault": true

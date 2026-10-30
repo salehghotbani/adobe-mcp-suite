@@ -16,6 +16,6 @@ test('catalog includes every registered default tool and explicitly marks arbitr
     assert.equal(catalog[app].filter((t) => t.name === 'connection_status').length, 1);
     defaults += catalog[app].filter((t) => t.enabledByDefault).length;
   }
-  assert.equal(defaults, 93);
+  assert.equal(defaults, 131);
   assert.match(markdown, /connection_status/);
 });

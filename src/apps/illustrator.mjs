@@ -194,5 +194,124 @@ export const tools = [
   d.exportFile(f, ExportType.PNG24, o);
   return { path: f.fsName };
 `
+  ),
+  tool(
+    'get_selection',
+    'Read selected Illustrator objects with bounded text previews. Text selections are supported.',
+    pageSize,
+    doc +
+      `
+  var selected = d.selection,
+    a = [];
+  if (!selected) return { total: 0, items: a };
+  if (selected.typename) selected = [selected];
+  for (var i = p.offset; i < selected.length && a.length < p.limit; i++) {
+    var item = selected[i],
+      entry = { index: i + 1, type: String(item.typename) };
+    try {
+      entry.name = String(item.name || '');
+    } catch (e) {}
+    try {
+      var b = item.geometricBounds;
+      if (b) entry.bounds = [Number(b[0]), Number(b[1]), Number(b[2]), Number(b[3])];
+    } catch (e) {}
+    if (item.typename === 'TextFrame' || item.typename === 'TextRange')
+      entry.textPreview = String(item.contents).slice(0, 1000);
+    a.push(entry);
+  }
+  return { total: selected.length, items: a };
+`,
+    true
+  ),
+  tool(
+    'set_layer',
+    'Rename, show, hide, lock or unlock a top-level Illustrator layer by one-based index.',
+    {
+      layerIndex: index,
+      name: text.optional(),
+      visible: z.boolean().optional(),
+      locked: z.boolean().optional()
+    },
+    doc +
+      `
+  h.require(p.layerIndex <= d.layers.length, 'Layer index not found.');
+  var l = d.layers[p.layerIndex - 1];
+  if (p.locked === false) l.locked = false;
+  if (p.name !== undefined) l.name = p.name;
+  if (p.visible !== undefined) l.visible = p.visible;
+  if (p.locked === true) l.locked = true;
+  return { index: p.layerIndex, name: l.name, visible: l.visible, locked: l.locked };
+`
+  ),
+  tool(
+    'activate_artboard',
+    'Activate an artboard by one-based index.',
+    { artboardIndex: index },
+    doc +
+      `
+  h.require(p.artboardIndex <= d.artboards.length, 'Artboard index not found.');
+  d.artboards.setActiveArtboardIndex(p.artboardIndex - 1);
+  return { index: p.artboardIndex, name: d.artboards[p.artboardIndex - 1].name };
+`
+  ),
+  tool(
+    'add_ellipse',
+    'Draw a filled ellipse. Position and dimensions are points; RGB components range from zero to one.',
+    {
+      left: z.number(),
+      top: z.number(),
+      width: z.number().positive(),
+      height: z.number().positive(),
+      color: rgb.default([0.1, 0.4, 1]),
+      name: text.default('MCP Ellipse')
+    },
+    doc +
+      color +
+      `
+  var item = d.pathItems.ellipse(p.top, p.left, p.width, p.height);
+  item.name = p.name;
+  item.stroked = false;
+  item.filled = true;
+  item.fillColor = color(p.color);
+  return { name: item.name };
+`
+  ),
+  tool(
+    'place_image',
+    'Place a linked local image at [x,y] points using its natural size.',
+    {
+      path: filePath,
+      x: z.number().default(0),
+      y: z.number().default(0),
+      name: text.default('MCP Image')
+    },
+    doc +
+      `
+  var source = h.input(p.path),
+    item = d.placedItems.add();
+  try {
+    item.file = source;
+    item.position = [p.x, p.y];
+    item.name = p.name;
+    return { name: item.name, width: item.width, height: item.height };
+  } catch (error) {
+    item.remove();
+    throw error;
+  }
+`
+  ),
+  tool(
+    'save_as_pdf',
+    'Save the active Illustrator document as PDF. This changes its current file association.',
+    { ...outputFieldsFor('pdf'), preserveEditability: z.boolean().default(true) },
+    doc +
+      `
+  var f = h.output(p.path, p.overwrite),
+    options = new PDFSaveOptions();
+  options.preserveEditability = p.preserveEditability;
+  options.viewAfterSaving = false;
+  d.saveAs(f, options);
+  return { path: f.fsName, preserveEditability: p.preserveEditability };
+`
   )
 ];

@@ -186,5 +186,73 @@ export const tools = [
   }
   return { path: f.fsName };
 `
+  ),
+  tool(
+    'activate_document',
+    'Activate an open InDesign document by its document ID.',
+    { documentId: z.number().int().positive() },
+    `
+  var target = app.documents.itemByID(p.documentId);
+  h.require(target.isValid, 'Document ID not found.');
+  app.activeDocument = target;
+  return { id: target.id, name: target.name };
+`
+  ),
+  tool(
+    'get_document_info',
+    'Read active document identity, page/story/link counts, saved state and unsaved changes.',
+    {},
+    doc +
+      `
+  return {
+    id: d.id,
+    name: d.name,
+    pages: d.pages.length,
+    stories: d.stories.length,
+    links: d.links.length,
+    saved: d.saved,
+    modified: d.modified
+  };
+`,
+    true
+  ),
+  tool(
+    'list_links',
+    'List placed-file links, IDs, paths and native status values in the active document.',
+    pageSize,
+    doc +
+      `
+  var links = [];
+  for (var i = p.offset; i < d.links.length && links.length < p.limit; i++) {
+    var link = d.links[i];
+    links.push({ id: link.id, name: link.name, path: link.filePath, status: String(link.status) });
+  }
+  return { total: d.links.length, links: links };
+`,
+    true
+  ),
+  tool(
+    'update_link',
+    'Refresh one placed-file link by ID. The linked source must still exist.',
+    { linkId: z.number().int().positive() },
+    doc +
+      `
+  var link = d.links.itemByID(p.linkId);
+  h.require(link.isValid, 'Link ID not found.');
+  h.input(link.filePath);
+  link.update();
+  return { id: link.id, status: String(link.status) };
+`
+  ),
+  tool(
+    'export_idml',
+    'Export an IDML interchange copy without changing the current INDD file association.',
+    outputFieldsFor('idml'),
+    doc +
+      `
+  var f = h.output(p.path, p.overwrite);
+  d.exportFile(ExportFormat.INDESIGN_MARKUP, f, false);
+  return { path: f.fsName };
+`
   )
 ];
