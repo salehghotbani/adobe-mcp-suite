@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+
+- Separate bridge, configuration, MCP, setup, and catalog modules while preserving all seven server entrypoints.
+- Organize tests into unit, integration, and shared fixture directories; consolidate branding and archive earlier designs.
+- Validate saved connection settings before setup writes and avoid exposing credentials in configuration errors.
+- Include shared tools in the generated catalog and add a read-only documentation freshness check.
+- Add consistent source formatting, centralized version metadata, and a declarative CEP manifest template.
+- Preserve the actionable uncertain-operation error after a stale panel lease and avoid invoking panel request callbacks twice.
+
 ## 0.1.0 — 2026-10-30
 
 Initial source release.

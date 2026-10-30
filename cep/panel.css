@@ -1,1 +1,94 @@
-:root{color-scheme:dark;font-family:Arial,Helvetica,sans-serif;background:#17181b;color:#ededf0;font-size:13px}*{box-sizing:border-box}body{margin:0}main{max-width:560px;padding:24px;margin:0 auto}header{display:flex;align-items:center;gap:14px;margin-bottom:28px}header img{width:58px;height:58px;border-radius:14px}h1{margin:5px 0 0;font-size:25px;font-weight:600;letter-spacing:-.8px}.eyebrow{font-size:9px;letter-spacing:1.5px;color:#9b9da6}.card{background:#222328;border:1px solid #34353d;border-radius:12px;padding:18px}.row{display:flex;align-items:center;justify-content:space-between;gap:12px}#app{font-weight:600}#state{font-size:11px;color:#a6a8b2}#state.connected{color:#67dfae}#state.error{color:#ff858b}#detail{color:#b0b2bd;font-size:12px;line-height:1.7;overflow-wrap:anywhere;margin-bottom:0}.controls{margin:18px 0;color:#91949f;font-size:11px}button{background:#353740;border:1px solid #464953;border-radius:6px;color:#eee;padding:8px 12px;cursor:pointer}button:hover{background:#424550}.footnote{margin-top:32px;color:#71747e;font-size:10px;line-height:1.8}
+:root {
+  color-scheme: dark;
+  font-family: Arial, Helvetica, sans-serif;
+  background: #17181b;
+  color: #ededf0;
+  font-size: 13px;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+main {
+  max-width: 560px;
+  padding: 24px;
+  margin: 0 auto;
+}
+header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 28px;
+}
+header img {
+  width: 58px;
+  height: 58px;
+  border-radius: 14px;
+}
+h1 {
+  margin: 5px 0 0;
+  font-size: 25px;
+  font-weight: 600;
+  letter-spacing: -0.8px;
+}
+.eyebrow {
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  color: #9b9da6;
+}
+.card {
+  background: #222328;
+  border: 1px solid #34353d;
+  border-radius: 12px;
+  padding: 18px;
+}
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+#app {
+  font-weight: 600;
+}
+#state {
+  font-size: 11px;
+  color: #a6a8b2;
+}
+#state.connected {
+  color: #67dfae;
+}
+#state.error {
+  color: #ff858b;
+}
+#detail {
+  color: #b0b2bd;
+  font-size: 12px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+  margin-bottom: 0;
+}
+.controls {
+  margin: 18px 0;
+  color: #91949f;
+  font-size: 11px;
+}
+button {
+  background: #353740;
+  border: 1px solid #464953;
+  border-radius: 6px;
+  color: #eee;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+button:hover {
+  background: #424550;
+}
+.footnote {
+  margin-top: 32px;
+  color: #71747e;
+  font-size: 10px;
+  line-height: 1.8;
+}

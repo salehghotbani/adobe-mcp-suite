@@ -1,6 +1,6 @@
 name: Feature request
 description: Propose a focused tool or workflow improvement.
-title: "[Feature]: "
+title: '[Feature]: '
 body:
   - type: textarea
     id: problem
@@ -12,7 +12,7 @@ body:
     id: proposal
     attributes:
       label: Proposed behavior
-      description: "Include application versions, relevant official APIs, and expected tool inputs and results where known."
+      description: 'Include application versions, relevant official APIs, and expected tool inputs and results where known.'
     validations:
       required: true
   - type: textarea

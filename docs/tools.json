@@ -1,6 +1,23 @@
 {
   "premiere-pro": [
     {
+      "name": "connection_status",
+      "description": "Check the local bridge for Premiere Pro; works without Adobe connected.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "enabledByDefault": true
+    },
+    {
       "name": "get_app_info",
       "description": "Read the connected Adobe application name and version.",
       "inputSchema": {
@@ -14,32 +31,8 @@
         "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": false
-      }
-    },
-    {
-      "name": "run_script",
-      "description": "Execute arbitrary ExtendScript with full Adobe scripting permissions. Return a plain JSON-compatible value using return. No browser or Node APIs.",
-      "inputSchema": {
-        "$schema": "https://json-schema.org/draft/2020-12/schema",
-        "type": "object",
-        "properties": {
-          "code": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 200000
-          }
-        },
-        "required": [
-          "code"
-        ],
-        "additionalProperties": false
       },
-      "annotations": {
-        "readOnlyHint": false,
-        "destructiveHint": true,
-        "idempotentHint": false,
-        "openWorldHint": false
-      }
+      "enabledByDefault": true
     },
     {
       "name": "get_project",
@@ -55,7 +48,8 @@
         "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "list_sequences",
@@ -71,7 +65,8 @@
         "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "activate_sequence",
@@ -79,16 +74,8 @@
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
-        "properties": {
-          "sequenceId": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 10000
-          }
-        },
-        "required": [
-          "sequenceId"
-        ],
+        "properties": { "sequenceId": { "type": "string", "minLength": 1, "maxLength": 10000 } },
+        "required": ["sequenceId"],
         "additionalProperties": false
       },
       "annotations": {
@@ -96,7 +83,8 @@
         "destructiveHint": true,
         "idempotentHint": false,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "list_project_items",
@@ -105,23 +93,10 @@
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
-          "offset": {
-            "default": 0,
-            "type": "integer",
-            "minimum": 0,
-            "maximum": 9007199254740991
-          },
-          "limit": {
-            "default": 100,
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 500
-          }
+          "offset": { "default": 0, "type": "integer", "minimum": 0, "maximum": 9007199254740991 },
+          "limit": { "default": 100, "type": "integer", "minimum": 1, "maximum": 500 }
         },
-        "required": [
-          "offset",
-          "limit"
-        ],
+        "required": ["offset", "limit"],
         "additionalProperties": false
       },
       "annotations": {
@@ -129,7 +104,8 @@
         "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "create_bin",
@@ -137,16 +113,8 @@
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
-        "properties": {
-          "name": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 10000
-          }
-        },
-        "required": [
-          "name"
-        ],
+        "properties": { "name": { "type": "string", "minLength": 1, "maxLength": 10000 } },
+        "required": ["name"],
         "additionalProperties": false
       },
       "annotations": {
@@ -154,7 +122,8 @@
         "destructiveHint": true,
         "idempotentHint": false,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "import_media",
@@ -167,16 +136,10 @@
             "minItems": 1,
             "maxItems": 100,
             "type": "array",
-            "items": {
-              "type": "string",
-              "minLength": 1,
-              "maxLength": 32767
-            }
+            "items": { "type": "string", "minLength": 1, "maxLength": 32767 }
           }
         },
-        "required": [
-          "paths"
-        ],
+        "required": ["paths"],
         "additionalProperties": false
       },
       "annotations": {
@@ -184,7 +147,8 @@
         "destructiveHint": true,
         "idempotentHint": false,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "create_sequence_from_clips",
@@ -193,26 +157,15 @@
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
-          "name": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 10000
-          },
+          "name": { "type": "string", "minLength": 1, "maxLength": 10000 },
           "nodeIds": {
             "minItems": 1,
             "maxItems": 100,
             "type": "array",
-            "items": {
-              "type": "string",
-              "minLength": 1,
-              "maxLength": 10000
-            }
+            "items": { "type": "string", "minLength": 1, "maxLength": 10000 }
           }
         },
-        "required": [
-          "name",
-          "nodeIds"
-        ],
+        "required": ["name", "nodeIds"],
         "additionalProperties": false
       },
       "annotations": {
@@ -220,7 +173,8 @@
         "destructiveHint": true,
         "idempotentHint": false,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "get_timeline",
@@ -229,39 +183,17 @@
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
-          "kind": {
-            "default": "video",
-            "type": "string",
-            "enum": [
-              "video",
-              "audio"
-            ]
-          },
+          "kind": { "default": "video", "type": "string", "enum": ["video", "audio"] },
           "trackIndex": {
             "default": 0,
             "type": "integer",
             "minimum": 0,
             "maximum": 9007199254740991
           },
-          "offset": {
-            "default": 0,
-            "type": "integer",
-            "minimum": 0,
-            "maximum": 9007199254740991
-          },
-          "limit": {
-            "default": 100,
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 500
-          }
+          "offset": { "default": 0, "type": "integer", "minimum": 0, "maximum": 9007199254740991 },
+          "limit": { "default": 100, "type": "integer", "minimum": 1, "maximum": 500 }
         },
-        "required": [
-          "kind",
-          "trackIndex",
-          "offset",
-          "limit"
-        ],
+        "required": ["kind", "trackIndex", "offset", "limit"],
         "additionalProperties": false
       },
       "annotations": {
@@ -269,7 +201,8 @@
         "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "insert_clip",
@@ -278,36 +211,17 @@
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
-          "nodeId": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 10000
-          },
-          "kind": {
-            "default": "video",
-            "type": "string",
-            "enum": [
-              "video",
-              "audio"
-            ]
-          },
+          "nodeId": { "type": "string", "minLength": 1, "maxLength": 10000 },
+          "kind": { "default": "video", "type": "string", "enum": ["video", "audio"] },
           "trackIndex": {
             "default": 0,
             "type": "integer",
             "minimum": 0,
             "maximum": 9007199254740991
           },
-          "seconds": {
-            "type": "number",
-            "minimum": 0
-          }
+          "seconds": { "type": "number", "minimum": 0 }
         },
-        "required": [
-          "nodeId",
-          "kind",
-          "trackIndex",
-          "seconds"
-        ],
+        "required": ["nodeId", "kind", "trackIndex", "seconds"],
         "additionalProperties": false
       },
       "annotations": {
@@ -315,7 +229,8 @@
         "destructiveHint": true,
         "idempotentHint": false,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "add_marker",
@@ -324,26 +239,11 @@
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
-          "seconds": {
-            "type": "number",
-            "minimum": 0
-          },
-          "name": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 10000
-          },
-          "comments": {
-            "default": "",
-            "type": "string",
-            "maxLength": 10000
-          }
+          "seconds": { "type": "number", "minimum": 0 },
+          "name": { "type": "string", "minLength": 1, "maxLength": 10000 },
+          "comments": { "default": "", "type": "string", "maxLength": 10000 }
         },
-        "required": [
-          "seconds",
-          "name",
-          "comments"
-        ],
+        "required": ["seconds", "name", "comments"],
         "additionalProperties": false
       },
       "annotations": {
@@ -351,7 +251,8 @@
         "destructiveHint": true,
         "idempotentHint": false,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "save_project",
@@ -367,7 +268,8 @@
         "destructiveHint": true,
         "idempotentHint": false,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "export_sequence",
@@ -376,37 +278,20 @@
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
-          "path": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 32767
-          },
+          "path": { "type": "string", "minLength": 1, "maxLength": 32767 },
           "overwrite": {
             "default": false,
             "description": "Explicitly permit replacing an existing output file",
             "type": "boolean"
           },
-          "preset": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 32767
-          },
+          "preset": { "type": "string", "minLength": 1, "maxLength": 32767 },
           "range": {
             "default": "entire",
             "type": "string",
-            "enum": [
-              "entire",
-              "in_out",
-              "work_area"
-            ]
+            "enum": ["entire", "in_out", "work_area"]
           }
         },
-        "required": [
-          "path",
-          "overwrite",
-          "preset",
-          "range"
-        ],
+        "required": ["path", "overwrite", "preset", "range"],
         "additionalProperties": false
       },
       "annotations": {
@@ -414,10 +299,46 @@
         "destructiveHint": true,
         "idempotentHint": false,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
+    },
+    {
+      "name": "run_script",
+      "description": "Execute arbitrary ExtendScript with full Adobe scripting permissions. Return a plain JSON-compatible value using return. No browser or Node APIs.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": { "code": { "type": "string", "minLength": 1, "maxLength": 200000 } },
+        "required": ["code"],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "enabledByDefault": false
     }
   ],
   "photoshop": [
+    {
+      "name": "connection_status",
+      "description": "Check the local bridge for Photoshop; works without Adobe connected.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "enabledByDefault": true
+    },
     {
       "name": "get_app_info",
       "description": "Read the connected Adobe application name and version.",
@@ -432,32 +353,8 @@
         "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": false
-      }
-    },
-    {
-      "name": "run_script",
-      "description": "Execute arbitrary ExtendScript with full Adobe scripting permissions. Return a plain JSON-compatible value using return. No browser or Node APIs.",
-      "inputSchema": {
-        "$schema": "https://json-schema.org/draft/2020-12/schema",
-        "type": "object",
-        "properties": {
-          "code": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 200000
-          }
-        },
-        "required": [
-          "code"
-        ],
-        "additionalProperties": false
       },
-      "annotations": {
-        "readOnlyHint": false,
-        "destructiveHint": true,
-        "idempotentHint": false,
-        "openWorldHint": false
-      }
+      "enabledByDefault": true
     },
     {
       "name": "list_documents",
@@ -473,7 +370,8 @@
         "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "open_document",
@@ -481,16 +379,8 @@
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
-        "properties": {
-          "path": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 32767
-          }
-        },
-        "required": [
-          "path"
-        ],
+        "properties": { "path": { "type": "string", "minLength": 1, "maxLength": 32767 } },
+        "required": ["path"],
         "additionalProperties": false
       },
       "annotations": {
@@ -498,7 +388,8 @@
         "destructiveHint": true,
         "idempotentHint": false,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "create_document",
@@ -507,34 +398,12 @@
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
-          "name": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 10000
-          },
-          "width": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 30000
-          },
-          "height": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 30000
-          },
-          "resolution": {
-            "default": 72,
-            "type": "number",
-            "minimum": 1,
-            "maximum": 2400
-          }
+          "name": { "type": "string", "minLength": 1, "maxLength": 10000 },
+          "width": { "type": "integer", "minimum": 1, "maximum": 30000 },
+          "height": { "type": "integer", "minimum": 1, "maximum": 30000 },
+          "resolution": { "default": 72, "type": "number", "minimum": 1, "maximum": 2400 }
         },
-        "required": [
-          "name",
-          "width",
-          "height",
-          "resolution"
-        ],
+        "required": ["name", "width", "height", "resolution"],
         "additionalProperties": false
       },
       "annotations": {
@@ -542,7 +411,8 @@
         "destructiveHint": true,
         "idempotentHint": false,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "activate_document",
@@ -551,15 +421,9 @@
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
-          "documentId": {
-            "type": "integer",
-            "exclusiveMinimum": 0,
-            "maximum": 9007199254740991
-          }
+          "documentId": { "type": "integer", "exclusiveMinimum": 0, "maximum": 9007199254740991 }
         },
-        "required": [
-          "documentId"
-        ],
+        "required": ["documentId"],
         "additionalProperties": false
       },
       "annotations": {
@@ -567,7 +431,8 @@
         "destructiveHint": true,
         "idempotentHint": false,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "list_layers",
@@ -576,23 +441,10 @@
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
-          "offset": {
-            "default": 0,
-            "type": "integer",
-            "minimum": 0,
-            "maximum": 9007199254740991
-          },
-          "limit": {
-            "default": 100,
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 500
-          }
+          "offset": { "default": 0, "type": "integer", "minimum": 0, "maximum": 9007199254740991 },
+          "limit": { "default": 100, "type": "integer", "minimum": 1, "maximum": 500 }
         },
-        "required": [
-          "offset",
-          "limit"
-        ],
+        "required": ["offset", "limit"],
         "additionalProperties": false
       },
       "annotations": {
@@ -600,7 +452,8 @@
         "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "create_layer",
@@ -608,16 +461,8 @@
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
-        "properties": {
-          "name": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 10000
-          }
-        },
-        "required": [
-          "name"
-        ],
+        "properties": { "name": { "type": "string", "minLength": 1, "maxLength": 10000 } },
+        "required": ["name"],
         "additionalProperties": false
       },
       "annotations": {
@@ -625,7 +470,8 @@
         "destructiveHint": true,
         "idempotentHint": false,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "set_layer",
@@ -634,28 +480,12 @@
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
-          "layerId": {
-            "type": "integer",
-            "exclusiveMinimum": 0,
-            "maximum": 9007199254740991
-          },
-          "name": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 10000
-          },
-          "visible": {
-            "type": "boolean"
-          },
-          "opacity": {
-            "type": "number",
-            "minimum": 0,
-            "maximum": 100
-          }
+          "layerId": { "type": "integer", "exclusiveMinimum": 0, "maximum": 9007199254740991 },
+          "name": { "type": "string", "minLength": 1, "maxLength": 10000 },
+          "visible": { "type": "boolean" },
+          "opacity": { "type": "number", "minimum": 0, "maximum": 100 }
         },
-        "required": [
-          "layerId"
-        ],
+        "required": ["layerId"],
         "additionalProperties": false
       },
       "annotations": {
@@ -663,7 +493,8 @@
         "destructiveHint": true,
         "idempotentHint": false,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "add_text",
@@ -672,39 +503,13 @@
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
-          "text": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 10000
-          },
-          "name": {
-            "default": "MCP Text",
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 10000
-          },
-          "x": {
-            "default": 100,
-            "type": "number"
-          },
-          "y": {
-            "default": 100,
-            "type": "number"
-          },
-          "size": {
-            "default": 48,
-            "type": "number",
-            "exclusiveMinimum": 0,
-            "maximum": 1296
-          }
+          "text": { "type": "string", "minLength": 1, "maxLength": 10000 },
+          "name": { "default": "MCP Text", "type": "string", "minLength": 1, "maxLength": 10000 },
+          "x": { "default": 100, "type": "number" },
+          "y": { "default": 100, "type": "number" },
+          "size": { "default": 48, "type": "number", "exclusiveMinimum": 0, "maximum": 1296 }
         },
-        "required": [
-          "text",
-          "name",
-          "x",
-          "y",
-          "size"
-        ],
+        "required": ["text", "name", "x", "y", "size"],
         "additionalProperties": false
       },
       "annotations": {
@@ -712,7 +517,8 @@
         "destructiveHint": true,
         "idempotentHint": false,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "resize_image",
@@ -721,21 +527,10 @@
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
-          "width": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 30000
-          },
-          "height": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 30000
-          }
+          "width": { "type": "integer", "minimum": 1, "maximum": 30000 },
+          "height": { "type": "integer", "minimum": 1, "maximum": 30000 }
         },
-        "required": [
-          "width",
-          "height"
-        ],
+        "required": ["width", "height"],
         "additionalProperties": false
       },
       "annotations": {
@@ -743,7 +538,8 @@
         "destructiveHint": true,
         "idempotentHint": false,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "save_document",
@@ -759,7 +555,8 @@
         "destructiveHint": true,
         "idempotentHint": false,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "save_as_psd",
@@ -768,21 +565,14 @@
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
-          "path": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 32767
-          },
+          "path": { "type": "string", "minLength": 1, "maxLength": 32767 },
           "overwrite": {
             "default": false,
             "description": "Explicitly permit replacing an existing output file",
             "type": "boolean"
           }
         },
-        "required": [
-          "path",
-          "overwrite"
-        ],
+        "required": ["path", "overwrite"],
         "additionalProperties": false
       },
       "annotations": {
@@ -790,7 +580,8 @@
         "destructiveHint": true,
         "idempotentHint": false,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "export_image",
@@ -799,37 +590,16 @@
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
-          "path": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 32767
-          },
+          "path": { "type": "string", "minLength": 1, "maxLength": 32767 },
           "overwrite": {
             "default": false,
             "description": "Explicitly permit replacing an existing output file",
             "type": "boolean"
           },
-          "format": {
-            "default": "png",
-            "type": "string",
-            "enum": [
-              "png",
-              "jpeg"
-            ]
-          },
-          "quality": {
-            "default": 90,
-            "type": "integer",
-            "minimum": 0,
-            "maximum": 100
-          }
+          "format": { "default": "png", "type": "string", "enum": ["png", "jpeg"] },
+          "quality": { "default": 90, "type": "integer", "minimum": 0, "maximum": 100 }
         },
-        "required": [
-          "path",
-          "overwrite",
-          "format",
-          "quality"
-        ],
+        "required": ["path", "overwrite", "format", "quality"],
         "additionalProperties": false
       },
       "annotations": {
@@ -837,10 +607,46 @@
         "destructiveHint": true,
         "idempotentHint": false,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
+    },
+    {
+      "name": "run_script",
+      "description": "Execute arbitrary ExtendScript with full Adobe scripting permissions. Return a plain JSON-compatible value using return. No browser or Node APIs.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": { "code": { "type": "string", "minLength": 1, "maxLength": 200000 } },
+        "required": ["code"],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "enabledByDefault": false
     }
   ],
   "media-encoder": [
+    {
+      "name": "connection_status",
+      "description": "Check the local bridge for Media Encoder; works without Adobe connected.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "enabledByDefault": true
+    },
     {
       "name": "get_app_info",
       "description": "Read the connected Adobe application name and version.",
@@ -855,32 +661,8 @@
         "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": false
-      }
-    },
-    {
-      "name": "run_script",
-      "description": "Execute arbitrary ExtendScript with full Adobe scripting permissions. Return a plain JSON-compatible value using return. No browser or Node APIs.",
-      "inputSchema": {
-        "$schema": "https://json-schema.org/draft/2020-12/schema",
-        "type": "object",
-        "properties": {
-          "code": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 200000
-          }
-        },
-        "required": [
-          "code"
-        ],
-        "additionalProperties": false
       },
-      "annotations": {
-        "readOnlyHint": false,
-        "destructiveHint": true,
-        "idempotentHint": false,
-        "openWorldHint": false
-      }
+      "enabledByDefault": true
     },
     {
       "name": "get_batch_status",
@@ -896,7 +678,8 @@
         "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "list_formats",
@@ -912,7 +695,8 @@
         "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "list_import_types",
@@ -928,7 +712,8 @@
         "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "add_to_queue",
@@ -937,39 +722,17 @@
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
-          "source": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 32767
-          },
-          "preset": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 32767
-          },
-          "path": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 32767
-          },
+          "source": { "type": "string", "minLength": 1, "maxLength": 32767 },
+          "preset": { "type": "string", "minLength": 1, "maxLength": 32767 },
+          "path": { "type": "string", "minLength": 1, "maxLength": 32767 },
           "overwrite": {
             "default": false,
             "description": "Explicitly permit replacing an existing output file",
             "type": "boolean"
           },
-          "format": {
-            "default": "",
-            "type": "string",
-            "maxLength": 100
-          }
+          "format": { "default": "", "type": "string", "maxLength": 100 }
         },
-        "required": [
-          "source",
-          "preset",
-          "path",
-          "overwrite",
-          "format"
-        ],
+        "required": ["source", "preset", "path", "overwrite", "format"],
         "additionalProperties": false
       },
       "annotations": {
@@ -977,7 +740,8 @@
         "destructiveHint": true,
         "idempotentHint": false,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "list_dynamic_link_items",
@@ -985,16 +749,8 @@
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
-        "properties": {
-          "path": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 32767
-          }
-        },
-        "required": [
-          "path"
-        ],
+        "properties": { "path": { "type": "string", "minLength": 1, "maxLength": 32767 } },
+        "required": ["path"],
         "additionalProperties": false
       },
       "annotations": {
@@ -1002,7 +758,8 @@
         "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "add_dynamic_link_to_queue",
@@ -1011,45 +768,18 @@
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
-          "project": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 32767
-          },
-          "guid": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 10000
-          },
-          "preset": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 32767
-          },
-          "path": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 32767
-          },
+          "project": { "type": "string", "minLength": 1, "maxLength": 32767 },
+          "guid": { "type": "string", "minLength": 1, "maxLength": 10000 },
+          "preset": { "type": "string", "minLength": 1, "maxLength": 32767 },
+          "path": { "type": "string", "minLength": 1, "maxLength": 32767 },
           "overwrite": {
             "default": false,
             "description": "Explicitly permit replacing an existing output file",
             "type": "boolean"
           },
-          "format": {
-            "default": "",
-            "type": "string",
-            "maxLength": 100
-          }
+          "format": { "default": "", "type": "string", "maxLength": 100 }
         },
-        "required": [
-          "project",
-          "guid",
-          "preset",
-          "path",
-          "overwrite",
-          "format"
-        ],
+        "required": ["project", "guid", "preset", "path", "overwrite", "format"],
         "additionalProperties": false
       },
       "annotations": {
@@ -1057,7 +787,8 @@
         "destructiveHint": true,
         "idempotentHint": false,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "start_batch",
@@ -1073,7 +804,8 @@
         "destructiveHint": true,
         "idempotentHint": false,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "pause_batch",
@@ -1089,7 +821,8 @@
         "destructiveHint": true,
         "idempotentHint": false,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "stop_batch",
@@ -1105,10 +838,46 @@
         "destructiveHint": true,
         "idempotentHint": false,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
+    },
+    {
+      "name": "run_script",
+      "description": "Execute arbitrary ExtendScript with full Adobe scripting permissions. Return a plain JSON-compatible value using return. No browser or Node APIs.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": { "code": { "type": "string", "minLength": 1, "maxLength": 200000 } },
+        "required": ["code"],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "enabledByDefault": false
     }
   ],
   "illustrator": [
+    {
+      "name": "connection_status",
+      "description": "Check the local bridge for Illustrator; works without Adobe connected.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "enabledByDefault": true
+    },
     {
       "name": "get_app_info",
       "description": "Read the connected Adobe application name and version.",
@@ -1123,32 +892,8 @@
         "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": false
-      }
-    },
-    {
-      "name": "run_script",
-      "description": "Execute arbitrary ExtendScript with full Adobe scripting permissions. Return a plain JSON-compatible value using return. No browser or Node APIs.",
-      "inputSchema": {
-        "$schema": "https://json-schema.org/draft/2020-12/schema",
-        "type": "object",
-        "properties": {
-          "code": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 200000
-          }
-        },
-        "required": [
-          "code"
-        ],
-        "additionalProperties": false
       },
-      "annotations": {
-        "readOnlyHint": false,
-        "destructiveHint": true,
-        "idempotentHint": false,
-        "openWorldHint": false
-      }
+      "enabledByDefault": true
     },
     {
       "name": "list_documents",
@@ -1164,7 +909,8 @@
         "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "open_document",
@@ -1172,16 +918,8 @@
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
-        "properties": {
-          "path": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 32767
-          }
-        },
-        "required": [
-          "path"
-        ],
+        "properties": { "path": { "type": "string", "minLength": 1, "maxLength": 32767 } },
+        "required": ["path"],
         "additionalProperties": false
       },
       "annotations": {
@@ -1189,7 +927,8 @@
         "destructiveHint": true,
         "idempotentHint": false,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "create_document",
@@ -1198,23 +937,10 @@
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
-          "width": {
-            "default": 1920,
-            "type": "number",
-            "exclusiveMinimum": 0,
-            "maximum": 16000
-          },
-          "height": {
-            "default": 1080,
-            "type": "number",
-            "exclusiveMinimum": 0,
-            "maximum": 16000
-          }
+          "width": { "default": 1920, "type": "number", "exclusiveMinimum": 0, "maximum": 16000 },
+          "height": { "default": 1080, "type": "number", "exclusiveMinimum": 0, "maximum": 16000 }
         },
-        "required": [
-          "width",
-          "height"
-        ],
+        "required": ["width", "height"],
         "additionalProperties": false
       },
       "annotations": {
@@ -1222,7 +948,8 @@
         "destructiveHint": true,
         "idempotentHint": false,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "activate_document",
@@ -1231,15 +958,9 @@
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
-          "documentIndex": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 9007199254740991
-          }
+          "documentIndex": { "type": "integer", "minimum": 1, "maximum": 9007199254740991 }
         },
-        "required": [
-          "documentIndex"
-        ],
+        "required": ["documentIndex"],
         "additionalProperties": false
       },
       "annotations": {
@@ -1247,7 +968,8 @@
         "destructiveHint": true,
         "idempotentHint": false,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "list_layers",
@@ -1256,23 +978,10 @@
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
-          "offset": {
-            "default": 0,
-            "type": "integer",
-            "minimum": 0,
-            "maximum": 9007199254740991
-          },
-          "limit": {
-            "default": 100,
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 500
-          }
+          "offset": { "default": 0, "type": "integer", "minimum": 0, "maximum": 9007199254740991 },
+          "limit": { "default": 100, "type": "integer", "minimum": 1, "maximum": 500 }
         },
-        "required": [
-          "offset",
-          "limit"
-        ],
+        "required": ["offset", "limit"],
         "additionalProperties": false
       },
       "annotations": {
@@ -1280,7 +989,8 @@
         "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "create_layer",
@@ -1288,16 +998,8 @@
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
-        "properties": {
-          "name": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 10000
-          }
-        },
-        "required": [
-          "name"
-        ],
+        "properties": { "name": { "type": "string", "minLength": 1, "maxLength": 10000 } },
+        "required": ["name"],
         "additionalProperties": false
       },
       "annotations": {
@@ -1305,7 +1007,8 @@
         "destructiveHint": true,
         "idempotentHint": false,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "list_artboards",
@@ -1321,7 +1024,8 @@
         "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "add_artboard",
@@ -1330,36 +1034,21 @@
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
-          "name": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 10000
-          },
+          "name": { "type": "string", "minLength": 1, "maxLength": 10000 },
           "rect": {
             "type": "array",
             "prefixItems": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "number"
-              },
-              {
-                "type": "number"
-              },
-              {
-                "type": "number"
-              }
+              { "type": "number" },
+              { "type": "number" },
+              { "type": "number" },
+              { "type": "number" }
             ],
             "items": false,
             "minItems": 4,
             "maxItems": 4
           }
         },
-        "required": [
-          "name",
-          "rect"
-        ],
+        "required": ["name", "rect"],
         "additionalProperties": false
       },
       "annotations": {
@@ -1367,7 +1056,8 @@
         "destructiveHint": true,
         "idempotentHint": false,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "add_rectangle",
@@ -1376,43 +1066,17 @@
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
-          "left": {
-            "type": "number"
-          },
-          "top": {
-            "type": "number"
-          },
-          "width": {
-            "type": "number",
-            "exclusiveMinimum": 0
-          },
-          "height": {
-            "type": "number",
-            "exclusiveMinimum": 0
-          },
+          "left": { "type": "number" },
+          "top": { "type": "number" },
+          "width": { "type": "number", "exclusiveMinimum": 0 },
+          "height": { "type": "number", "exclusiveMinimum": 0 },
           "color": {
-            "default": [
-              1,
-              0.1,
-              0.1
-            ],
+            "default": [1, 0.1, 0.1],
             "type": "array",
             "prefixItems": [
-              {
-                "type": "number",
-                "minimum": 0,
-                "maximum": 1
-              },
-              {
-                "type": "number",
-                "minimum": 0,
-                "maximum": 1
-              },
-              {
-                "type": "number",
-                "minimum": 0,
-                "maximum": 1
-              }
+              { "type": "number", "minimum": 0, "maximum": 1 },
+              { "type": "number", "minimum": 0, "maximum": 1 },
+              { "type": "number", "minimum": 0, "maximum": 1 }
             ],
             "items": false,
             "minItems": 3,
@@ -1425,14 +1089,7 @@
             "maxLength": 10000
           }
         },
-        "required": [
-          "left",
-          "top",
-          "width",
-          "height",
-          "color",
-          "name"
-        ],
+        "required": ["left", "top", "width", "height", "color", "name"],
         "additionalProperties": false
       },
       "annotations": {
@@ -1440,7 +1097,8 @@
         "destructiveHint": true,
         "idempotentHint": false,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "add_text",
@@ -1449,32 +1107,12 @@
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
-          "text": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 10000
-          },
-          "x": {
-            "default": 100,
-            "type": "number"
-          },
-          "y": {
-            "default": 100,
-            "type": "number"
-          },
-          "size": {
-            "default": 48,
-            "type": "number",
-            "exclusiveMinimum": 0,
-            "maximum": 1296
-          }
+          "text": { "type": "string", "minLength": 1, "maxLength": 10000 },
+          "x": { "default": 100, "type": "number" },
+          "y": { "default": 100, "type": "number" },
+          "size": { "default": 48, "type": "number", "exclusiveMinimum": 0, "maximum": 1296 }
         },
-        "required": [
-          "text",
-          "x",
-          "y",
-          "size"
-        ],
+        "required": ["text", "x", "y", "size"],
         "additionalProperties": false
       },
       "annotations": {
@@ -1482,7 +1120,8 @@
         "destructiveHint": true,
         "idempotentHint": false,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "save_as_ai",
@@ -1491,21 +1130,14 @@
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
-          "path": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 32767
-          },
+          "path": { "type": "string", "minLength": 1, "maxLength": 32767 },
           "overwrite": {
             "default": false,
             "description": "Explicitly permit replacing an existing output file",
             "type": "boolean"
           }
         },
-        "required": [
-          "path",
-          "overwrite"
-        ],
+        "required": ["path", "overwrite"],
         "additionalProperties": false
       },
       "annotations": {
@@ -1513,7 +1145,8 @@
         "destructiveHint": true,
         "idempotentHint": false,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "export_svg",
@@ -1522,21 +1155,14 @@
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
-          "path": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 32767
-          },
+          "path": { "type": "string", "minLength": 1, "maxLength": 32767 },
           "overwrite": {
             "default": false,
             "description": "Explicitly permit replacing an existing output file",
             "type": "boolean"
           }
         },
-        "required": [
-          "path",
-          "overwrite"
-        ],
+        "required": ["path", "overwrite"],
         "additionalProperties": false
       },
       "annotations": {
@@ -1544,7 +1170,8 @@
         "destructiveHint": true,
         "idempotentHint": false,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "export_png",
@@ -1553,28 +1180,15 @@
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
-          "path": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 32767
-          },
+          "path": { "type": "string", "minLength": 1, "maxLength": 32767 },
           "overwrite": {
             "default": false,
             "description": "Explicitly permit replacing an existing output file",
             "type": "boolean"
           },
-          "scale": {
-            "default": 100,
-            "type": "number",
-            "minimum": 1,
-            "maximum": 1000
-          }
+          "scale": { "default": 100, "type": "number", "minimum": 1, "maximum": 1000 }
         },
-        "required": [
-          "path",
-          "overwrite",
-          "scale"
-        ],
+        "required": ["path", "overwrite", "scale"],
         "additionalProperties": false
       },
       "annotations": {
@@ -1582,10 +1196,46 @@
         "destructiveHint": true,
         "idempotentHint": false,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
+    },
+    {
+      "name": "run_script",
+      "description": "Execute arbitrary ExtendScript with full Adobe scripting permissions. Return a plain JSON-compatible value using return. No browser or Node APIs.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": { "code": { "type": "string", "minLength": 1, "maxLength": 200000 } },
+        "required": ["code"],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "enabledByDefault": false
     }
   ],
   "indesign": [
+    {
+      "name": "connection_status",
+      "description": "Check the local bridge for InDesign; works without Adobe connected.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "enabledByDefault": true
+    },
     {
       "name": "get_app_info",
       "description": "Read the connected Adobe application name and version.",
@@ -1600,32 +1250,8 @@
         "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": false
-      }
-    },
-    {
-      "name": "run_script",
-      "description": "Execute arbitrary ExtendScript with full Adobe scripting permissions. Return a plain JSON-compatible value using return. No browser or Node APIs.",
-      "inputSchema": {
-        "$schema": "https://json-schema.org/draft/2020-12/schema",
-        "type": "object",
-        "properties": {
-          "code": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 200000
-          }
-        },
-        "required": [
-          "code"
-        ],
-        "additionalProperties": false
       },
-      "annotations": {
-        "readOnlyHint": false,
-        "destructiveHint": true,
-        "idempotentHint": false,
-        "openWorldHint": false
-      }
+      "enabledByDefault": true
     },
     {
       "name": "list_documents",
@@ -1641,7 +1267,8 @@
         "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "open_document",
@@ -1649,16 +1276,8 @@
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
-        "properties": {
-          "path": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 32767
-          }
-        },
-        "required": [
-          "path"
-        ],
+        "properties": { "path": { "type": "string", "minLength": 1, "maxLength": 32767 } },
+        "required": ["path"],
         "additionalProperties": false
       },
       "annotations": {
@@ -1666,7 +1285,8 @@
         "destructiveHint": true,
         "idempotentHint": false,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "create_document",
@@ -1675,33 +1295,12 @@
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
-          "width": {
-            "default": 595,
-            "type": "number",
-            "exclusiveMinimum": 0
-          },
-          "height": {
-            "default": 842,
-            "type": "number",
-            "exclusiveMinimum": 0
-          },
-          "pages": {
-            "default": 1,
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 1000
-          },
-          "facingPages": {
-            "default": false,
-            "type": "boolean"
-          }
+          "width": { "default": 595, "type": "number", "exclusiveMinimum": 0 },
+          "height": { "default": 842, "type": "number", "exclusiveMinimum": 0 },
+          "pages": { "default": 1, "type": "integer", "minimum": 1, "maximum": 1000 },
+          "facingPages": { "default": false, "type": "boolean" }
         },
-        "required": [
-          "width",
-          "height",
-          "pages",
-          "facingPages"
-        ],
+        "required": ["width", "height", "pages", "facingPages"],
         "additionalProperties": false
       },
       "annotations": {
@@ -1709,7 +1308,8 @@
         "destructiveHint": true,
         "idempotentHint": false,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "list_pages",
@@ -1718,23 +1318,10 @@
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
-          "offset": {
-            "default": 0,
-            "type": "integer",
-            "minimum": 0,
-            "maximum": 9007199254740991
-          },
-          "limit": {
-            "default": 100,
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 500
-          }
+          "offset": { "default": 0, "type": "integer", "minimum": 0, "maximum": 9007199254740991 },
+          "limit": { "default": 100, "type": "integer", "minimum": 1, "maximum": 500 }
         },
-        "required": [
-          "offset",
-          "limit"
-        ],
+        "required": ["offset", "limit"],
         "additionalProperties": false
       },
       "annotations": {
@@ -1742,7 +1329,8 @@
         "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "add_page",
@@ -1758,7 +1346,8 @@
         "destructiveHint": true,
         "idempotentHint": false,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "add_text_frame",
@@ -1767,49 +1356,23 @@
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
-          "page": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 9007199254740991
-          },
+          "page": { "type": "integer", "minimum": 1, "maximum": 9007199254740991 },
           "bounds": {
             "type": "array",
             "prefixItems": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "number"
-              },
-              {
-                "type": "number"
-              },
-              {
-                "type": "number"
-              }
+              { "type": "number" },
+              { "type": "number" },
+              { "type": "number" },
+              { "type": "number" }
             ],
             "items": false,
             "minItems": 4,
             "maxItems": 4
           },
-          "text": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 10000
-          },
-          "size": {
-            "default": 12,
-            "type": "number",
-            "exclusiveMinimum": 0,
-            "maximum": 1296
-          }
+          "text": { "type": "string", "minLength": 1, "maxLength": 10000 },
+          "size": { "default": 12, "type": "number", "exclusiveMinimum": 0, "maximum": 1296 }
         },
-        "required": [
-          "page",
-          "bounds",
-          "text",
-          "size"
-        ],
+        "required": ["page", "bounds", "text", "size"],
         "additionalProperties": false
       },
       "annotations": {
@@ -1817,7 +1380,8 @@
         "destructiveHint": true,
         "idempotentHint": false,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "list_text_frames",
@@ -1826,29 +1390,11 @@
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
-          "page": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 9007199254740991
-          },
-          "offset": {
-            "default": 0,
-            "type": "integer",
-            "minimum": 0,
-            "maximum": 9007199254740991
-          },
-          "limit": {
-            "default": 100,
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 500
-          }
+          "page": { "type": "integer", "minimum": 1, "maximum": 9007199254740991 },
+          "offset": { "default": 0, "type": "integer", "minimum": 0, "maximum": 9007199254740991 },
+          "limit": { "default": 100, "type": "integer", "minimum": 1, "maximum": 500 }
         },
-        "required": [
-          "page",
-          "offset",
-          "limit"
-        ],
+        "required": ["page", "offset", "limit"],
         "additionalProperties": false
       },
       "annotations": {
@@ -1856,7 +1402,8 @@
         "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "set_text",
@@ -1865,21 +1412,10 @@
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
-          "frameId": {
-            "type": "integer",
-            "exclusiveMinimum": 0,
-            "maximum": 9007199254740991
-          },
-          "text": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 10000
-          }
+          "frameId": { "type": "integer", "exclusiveMinimum": 0, "maximum": 9007199254740991 },
+          "text": { "type": "string", "minLength": 1, "maxLength": 10000 }
         },
-        "required": [
-          "frameId",
-          "text"
-        ],
+        "required": ["frameId", "text"],
         "additionalProperties": false
       },
       "annotations": {
@@ -1887,7 +1423,8 @@
         "destructiveHint": true,
         "idempotentHint": false,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "place_image",
@@ -1896,42 +1433,22 @@
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
-          "page": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 9007199254740991
-          },
+          "page": { "type": "integer", "minimum": 1, "maximum": 9007199254740991 },
           "bounds": {
             "type": "array",
             "prefixItems": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "number"
-              },
-              {
-                "type": "number"
-              },
-              {
-                "type": "number"
-              }
+              { "type": "number" },
+              { "type": "number" },
+              { "type": "number" },
+              { "type": "number" }
             ],
             "items": false,
             "minItems": 4,
             "maxItems": 4
           },
-          "path": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 32767
-          }
+          "path": { "type": "string", "minLength": 1, "maxLength": 32767 }
         },
-        "required": [
-          "page",
-          "bounds",
-          "path"
-        ],
+        "required": ["page", "bounds", "path"],
         "additionalProperties": false
       },
       "annotations": {
@@ -1939,7 +1456,8 @@
         "destructiveHint": true,
         "idempotentHint": false,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "save_as",
@@ -1948,21 +1466,14 @@
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
-          "path": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 32767
-          },
+          "path": { "type": "string", "minLength": 1, "maxLength": 32767 },
           "overwrite": {
             "default": false,
             "description": "Explicitly permit replacing an existing output file",
             "type": "boolean"
           }
         },
-        "required": [
-          "path",
-          "overwrite"
-        ],
+        "required": ["path", "overwrite"],
         "additionalProperties": false
       },
       "annotations": {
@@ -1970,7 +1481,8 @@
         "destructiveHint": true,
         "idempotentHint": false,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "list_pdf_presets",
@@ -1986,7 +1498,8 @@
         "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "export_pdf",
@@ -1995,26 +1508,15 @@
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
-          "path": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 32767
-          },
+          "path": { "type": "string", "minLength": 1, "maxLength": 32767 },
           "overwrite": {
             "default": false,
             "description": "Explicitly permit replacing an existing output file",
             "type": "boolean"
           },
-          "preset": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 10000
-          }
+          "preset": { "type": "string", "minLength": 1, "maxLength": 10000 }
         },
-        "required": [
-          "path",
-          "overwrite"
-        ],
+        "required": ["path", "overwrite"],
         "additionalProperties": false
       },
       "annotations": {
@@ -2022,10 +1524,46 @@
         "destructiveHint": true,
         "idempotentHint": false,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
+    },
+    {
+      "name": "run_script",
+      "description": "Execute arbitrary ExtendScript with full Adobe scripting permissions. Return a plain JSON-compatible value using return. No browser or Node APIs.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": { "code": { "type": "string", "minLength": 1, "maxLength": 200000 } },
+        "required": ["code"],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "enabledByDefault": false
     }
   ],
   "after-effects": [
+    {
+      "name": "connection_status",
+      "description": "Check the local bridge for After Effects; works without Adobe connected.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "enabledByDefault": true
+    },
     {
       "name": "get_app_info",
       "description": "Read the connected Adobe application name and version.",
@@ -2040,32 +1578,8 @@
         "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": false
-      }
-    },
-    {
-      "name": "run_script",
-      "description": "Execute arbitrary ExtendScript with full Adobe scripting permissions. Return a plain JSON-compatible value using return. No browser or Node APIs.",
-      "inputSchema": {
-        "$schema": "https://json-schema.org/draft/2020-12/schema",
-        "type": "object",
-        "properties": {
-          "code": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 200000
-          }
-        },
-        "required": [
-          "code"
-        ],
-        "additionalProperties": false
       },
-      "annotations": {
-        "readOnlyHint": false,
-        "destructiveHint": true,
-        "idempotentHint": false,
-        "openWorldHint": false
-      }
+      "enabledByDefault": true
     },
     {
       "name": "get_project",
@@ -2081,7 +1595,8 @@
         "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "open_project",
@@ -2089,16 +1604,8 @@
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
-        "properties": {
-          "path": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 32767
-          }
-        },
-        "required": [
-          "path"
-        ],
+        "properties": { "path": { "type": "string", "minLength": 1, "maxLength": 32767 } },
+        "required": ["path"],
         "additionalProperties": false
       },
       "annotations": {
@@ -2106,7 +1613,8 @@
         "destructiveHint": true,
         "idempotentHint": false,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "save_project_as",
@@ -2115,21 +1623,14 @@
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
-          "path": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 32767
-          },
+          "path": { "type": "string", "minLength": 1, "maxLength": 32767 },
           "overwrite": {
             "default": false,
             "description": "Explicitly permit replacing an existing output file",
             "type": "boolean"
           }
         },
-        "required": [
-          "path",
-          "overwrite"
-        ],
+        "required": ["path", "overwrite"],
         "additionalProperties": false
       },
       "annotations": {
@@ -2137,7 +1638,8 @@
         "destructiveHint": true,
         "idempotentHint": false,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "list_items",
@@ -2146,23 +1648,10 @@
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
-          "offset": {
-            "default": 0,
-            "type": "integer",
-            "minimum": 0,
-            "maximum": 9007199254740991
-          },
-          "limit": {
-            "default": 100,
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 500
-          }
+          "offset": { "default": 0, "type": "integer", "minimum": 0, "maximum": 9007199254740991 },
+          "limit": { "default": 100, "type": "integer", "minimum": 1, "maximum": 500 }
         },
-        "required": [
-          "offset",
-          "limit"
-        ],
+        "required": ["offset", "limit"],
         "additionalProperties": false
       },
       "annotations": {
@@ -2170,7 +1659,8 @@
         "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "import_file",
@@ -2178,16 +1668,8 @@
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
-        "properties": {
-          "path": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 32767
-          }
-        },
-        "required": [
-          "path"
-        ],
+        "properties": { "path": { "type": "string", "minLength": 1, "maxLength": 32767 } },
+        "required": ["path"],
         "additionalProperties": false
       },
       "annotations": {
@@ -2195,7 +1677,8 @@
         "destructiveHint": true,
         "idempotentHint": false,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "create_composition",
@@ -2204,43 +1687,13 @@
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
-          "name": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 10000
-          },
-          "width": {
-            "default": 1920,
-            "type": "integer",
-            "minimum": 4,
-            "maximum": 30000
-          },
-          "height": {
-            "default": 1080,
-            "type": "integer",
-            "minimum": 4,
-            "maximum": 30000
-          },
-          "duration": {
-            "default": 10,
-            "type": "number",
-            "minimum": 0.01,
-            "maximum": 10800
-          },
-          "frameRate": {
-            "default": 30,
-            "type": "number",
-            "minimum": 1,
-            "maximum": 120
-          }
+          "name": { "type": "string", "minLength": 1, "maxLength": 10000 },
+          "width": { "default": 1920, "type": "integer", "minimum": 4, "maximum": 30000 },
+          "height": { "default": 1080, "type": "integer", "minimum": 4, "maximum": 30000 },
+          "duration": { "default": 10, "type": "number", "minimum": 0.01, "maximum": 10800 },
+          "frameRate": { "default": 30, "type": "number", "minimum": 1, "maximum": 120 }
         },
-        "required": [
-          "name",
-          "width",
-          "height",
-          "duration",
-          "frameRate"
-        ],
+        "required": ["name", "width", "height", "duration", "frameRate"],
         "additionalProperties": false
       },
       "annotations": {
@@ -2248,7 +1701,8 @@
         "destructiveHint": true,
         "idempotentHint": false,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "list_layers",
@@ -2257,29 +1711,11 @@
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
-          "compIndex": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 9007199254740991
-          },
-          "offset": {
-            "default": 0,
-            "type": "integer",
-            "minimum": 0,
-            "maximum": 9007199254740991
-          },
-          "limit": {
-            "default": 100,
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 500
-          }
+          "compIndex": { "type": "integer", "minimum": 1, "maximum": 9007199254740991 },
+          "offset": { "default": 0, "type": "integer", "minimum": 0, "maximum": 9007199254740991 },
+          "limit": { "default": 100, "type": "integer", "minimum": 1, "maximum": 500 }
         },
-        "required": [
-          "compIndex",
-          "offset",
-          "limit"
-        ],
+        "required": ["compIndex", "offset", "limit"],
         "additionalProperties": false
       },
       "annotations": {
@@ -2287,7 +1723,8 @@
         "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "add_text",
@@ -2296,28 +1733,11 @@
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
-          "compIndex": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 9007199254740991
-          },
-          "text": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 10000
-          },
-          "size": {
-            "default": 72,
-            "type": "number",
-            "exclusiveMinimum": 0,
-            "maximum": 1296
-          }
+          "compIndex": { "type": "integer", "minimum": 1, "maximum": 9007199254740991 },
+          "text": { "type": "string", "minLength": 1, "maxLength": 10000 },
+          "size": { "default": 72, "type": "number", "exclusiveMinimum": 0, "maximum": 1296 }
         },
-        "required": [
-          "compIndex",
-          "text",
-          "size"
-        ],
+        "required": ["compIndex", "text", "size"],
         "additionalProperties": false
       },
       "annotations": {
@@ -2325,7 +1745,8 @@
         "destructiveHint": true,
         "idempotentHint": false,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "add_solid",
@@ -2334,50 +1755,22 @@
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
-          "compIndex": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 9007199254740991
-          },
-          "name": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 10000
-          },
+          "compIndex": { "type": "integer", "minimum": 1, "maximum": 9007199254740991 },
+          "name": { "type": "string", "minLength": 1, "maxLength": 10000 },
           "color": {
-            "default": [
-              0.1,
-              0.1,
-              0.1
-            ],
+            "default": [0.1, 0.1, 0.1],
             "type": "array",
             "prefixItems": [
-              {
-                "type": "number",
-                "minimum": 0,
-                "maximum": 1
-              },
-              {
-                "type": "number",
-                "minimum": 0,
-                "maximum": 1
-              },
-              {
-                "type": "number",
-                "minimum": 0,
-                "maximum": 1
-              }
+              { "type": "number", "minimum": 0, "maximum": 1 },
+              { "type": "number", "minimum": 0, "maximum": 1 },
+              { "type": "number", "minimum": 0, "maximum": 1 }
             ],
             "items": false,
             "minItems": 3,
             "maxItems": 3
           }
         },
-        "required": [
-          "compIndex",
-          "name",
-          "color"
-        ],
+        "required": ["compIndex", "name", "color"],
         "additionalProperties": false
       },
       "annotations": {
@@ -2385,7 +1778,8 @@
         "destructiveHint": true,
         "idempotentHint": false,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "add_footage_layer",
@@ -2394,21 +1788,10 @@
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
-          "compIndex": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 9007199254740991
-          },
-          "itemIndex": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 9007199254740991
-          }
+          "compIndex": { "type": "integer", "minimum": 1, "maximum": 9007199254740991 },
+          "itemIndex": { "type": "integer", "minimum": 1, "maximum": 9007199254740991 }
         },
-        "required": [
-          "compIndex",
-          "itemIndex"
-        ],
+        "required": ["compIndex", "itemIndex"],
         "additionalProperties": false
       },
       "annotations": {
@@ -2416,7 +1799,8 @@
         "destructiveHint": true,
         "idempotentHint": false,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "set_transform",
@@ -2425,26 +1809,11 @@
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
-          "compIndex": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 9007199254740991
-          },
-          "layerIndex": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 9007199254740991
-          },
+          "compIndex": { "type": "integer", "minimum": 1, "maximum": 9007199254740991 },
+          "layerIndex": { "type": "integer", "minimum": 1, "maximum": 9007199254740991 },
           "position": {
             "type": "array",
-            "prefixItems": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "number"
-              }
-            ],
+            "prefixItems": [{ "type": "number" }, { "type": "number" }],
             "items": false,
             "minItems": 2,
             "maxItems": 2
@@ -2452,32 +1821,17 @@
           "scale": {
             "type": "array",
             "prefixItems": [
-              {
-                "type": "number",
-                "exclusiveMinimum": 0
-              },
-              {
-                "type": "number",
-                "exclusiveMinimum": 0
-              }
+              { "type": "number", "exclusiveMinimum": 0 },
+              { "type": "number", "exclusiveMinimum": 0 }
             ],
             "items": false,
             "minItems": 2,
             "maxItems": 2
           },
-          "rotation": {
-            "type": "number"
-          },
-          "opacity": {
-            "type": "number",
-            "minimum": 0,
-            "maximum": 100
-          }
+          "rotation": { "type": "number" },
+          "opacity": { "type": "number", "minimum": 0, "maximum": 100 }
         },
-        "required": [
-          "compIndex",
-          "layerIndex"
-        ],
+        "required": ["compIndex", "layerIndex"],
         "additionalProperties": false
       },
       "annotations": {
@@ -2485,7 +1839,8 @@
         "destructiveHint": true,
         "idempotentHint": false,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "set_opacity_keyframe",
@@ -2494,32 +1849,12 @@
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
-          "compIndex": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 9007199254740991
-          },
-          "layerIndex": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 9007199254740991
-          },
-          "time": {
-            "type": "number",
-            "minimum": 0
-          },
-          "opacity": {
-            "type": "number",
-            "minimum": 0,
-            "maximum": 100
-          }
+          "compIndex": { "type": "integer", "minimum": 1, "maximum": 9007199254740991 },
+          "layerIndex": { "type": "integer", "minimum": 1, "maximum": 9007199254740991 },
+          "time": { "type": "number", "minimum": 0 },
+          "opacity": { "type": "number", "minimum": 0, "maximum": 100 }
         },
-        "required": [
-          "compIndex",
-          "layerIndex",
-          "time",
-          "opacity"
-        ],
+        "required": ["compIndex", "layerIndex", "time", "opacity"],
         "additionalProperties": false
       },
       "annotations": {
@@ -2527,7 +1862,8 @@
         "destructiveHint": true,
         "idempotentHint": false,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "add_to_render_queue",
@@ -2536,37 +1872,17 @@
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
-          "compIndex": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 9007199254740991
-          },
-          "path": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 32767
-          },
+          "compIndex": { "type": "integer", "minimum": 1, "maximum": 9007199254740991 },
+          "path": { "type": "string", "minLength": 1, "maxLength": 32767 },
           "overwrite": {
             "default": false,
             "description": "Explicitly permit replacing an existing output file",
             "type": "boolean"
           },
-          "renderTemplate": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 10000
-          },
-          "outputTemplate": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 10000
-          }
+          "renderTemplate": { "type": "string", "minLength": 1, "maxLength": 10000 },
+          "outputTemplate": { "type": "string", "minLength": 1, "maxLength": 10000 }
         },
-        "required": [
-          "compIndex",
-          "path",
-          "overwrite"
-        ],
+        "required": ["compIndex", "path", "overwrite"],
         "additionalProperties": false
       },
       "annotations": {
@@ -2574,7 +1890,8 @@
         "destructiveHint": true,
         "idempotentHint": false,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "list_render_queue",
@@ -2590,7 +1907,8 @@
         "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "render_queue",
@@ -2606,10 +1924,46 @@
         "destructiveHint": true,
         "idempotentHint": false,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
+    },
+    {
+      "name": "run_script",
+      "description": "Execute arbitrary ExtendScript with full Adobe scripting permissions. Return a plain JSON-compatible value using return. No browser or Node APIs.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": { "code": { "type": "string", "minLength": 1, "maxLength": 200000 } },
+        "required": ["code"],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "enabledByDefault": false
     }
   ],
   "audition": [
+    {
+      "name": "connection_status",
+      "description": "Check the local bridge for Audition; works without Adobe connected.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "enabledByDefault": true
+    },
     {
       "name": "get_app_info",
       "description": "Read the connected Adobe application name and version.",
@@ -2624,32 +1978,8 @@
         "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": false
-      }
-    },
-    {
-      "name": "run_script",
-      "description": "Execute arbitrary ExtendScript with full Adobe scripting permissions. Return a plain JSON-compatible value using return. No browser or Node APIs.",
-      "inputSchema": {
-        "$schema": "https://json-schema.org/draft/2020-12/schema",
-        "type": "object",
-        "properties": {
-          "code": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 200000
-          }
-        },
-        "required": [
-          "code"
-        ],
-        "additionalProperties": false
       },
-      "annotations": {
-        "readOnlyHint": false,
-        "destructiveHint": true,
-        "idempotentHint": false,
-        "openWorldHint": false
-      }
+      "enabledByDefault": true
     },
     {
       "name": "list_commands",
@@ -2658,29 +1988,11 @@
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
-          "offset": {
-            "default": 0,
-            "type": "integer",
-            "minimum": 0,
-            "maximum": 9007199254740991
-          },
-          "limit": {
-            "default": 100,
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 500
-          },
-          "query": {
-            "default": "",
-            "type": "string",
-            "maxLength": 200
-          }
+          "offset": { "default": 0, "type": "integer", "minimum": 0, "maximum": 9007199254740991 },
+          "limit": { "default": 100, "type": "integer", "minimum": 1, "maximum": 500 },
+          "query": { "default": "", "type": "string", "maxLength": 200 }
         },
-        "required": [
-          "offset",
-          "limit",
-          "query"
-        ],
+        "required": ["offset", "limit", "query"],
         "additionalProperties": false
       },
       "annotations": {
@@ -2688,7 +2000,8 @@
         "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "is_command_enabled",
@@ -2696,16 +2009,8 @@
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
-        "properties": {
-          "commandId": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 10000
-          }
-        },
-        "required": [
-          "commandId"
-        ],
+        "properties": { "commandId": { "type": "string", "minLength": 1, "maxLength": 10000 } },
+        "required": ["commandId"],
         "additionalProperties": false
       },
       "annotations": {
@@ -2713,7 +2018,8 @@
         "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "invoke_command",
@@ -2721,16 +2027,8 @@
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
-        "properties": {
-          "commandId": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 10000
-          }
-        },
-        "required": [
-          "commandId"
-        ],
+        "properties": { "commandId": { "type": "string", "minLength": 1, "maxLength": 10000 } },
+        "required": ["commandId"],
         "additionalProperties": false
       },
       "annotations": {
@@ -2738,7 +2036,8 @@
         "destructiveHint": true,
         "idempotentHint": false,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "get_active_document",
@@ -2754,7 +2053,8 @@
         "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "set_playhead",
@@ -2762,15 +2062,8 @@
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
-        "properties": {
-          "seconds": {
-            "type": "number",
-            "minimum": 0
-          }
-        },
-        "required": [
-          "seconds"
-        ],
+        "properties": { "seconds": { "type": "number", "minimum": 0 } },
+        "required": ["seconds"],
         "additionalProperties": false
       },
       "annotations": {
@@ -2778,7 +2071,8 @@
         "destructiveHint": true,
         "idempotentHint": false,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
     },
     {
       "name": "inspect_api",
@@ -2790,29 +2084,12 @@
           "target": {
             "default": "application",
             "type": "string",
-            "enum": [
-              "application",
-              "active_document"
-            ]
+            "enum": ["application", "active_document"]
           },
-          "offset": {
-            "default": 0,
-            "type": "integer",
-            "minimum": 0,
-            "maximum": 9007199254740991
-          },
-          "limit": {
-            "default": 100,
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 500
-          }
+          "offset": { "default": 0, "type": "integer", "minimum": 0, "maximum": 9007199254740991 },
+          "limit": { "default": 100, "type": "integer", "minimum": 1, "maximum": 500 }
         },
-        "required": [
-          "target",
-          "offset",
-          "limit"
-        ],
+        "required": ["target", "offset", "limit"],
         "additionalProperties": false
       },
       "annotations": {
@@ -2820,7 +2097,26 @@
         "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": false
-      }
+      },
+      "enabledByDefault": true
+    },
+    {
+      "name": "run_script",
+      "description": "Execute arbitrary ExtendScript with full Adobe scripting permissions. Return a plain JSON-compatible value using return. No browser or Node APIs.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": { "code": { "type": "string", "minLength": 1, "maxLength": 200000 } },
+        "required": ["code"],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "enabledByDefault": false
     }
   ]
 }

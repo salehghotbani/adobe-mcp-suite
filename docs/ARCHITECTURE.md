@@ -1,6 +1,19 @@
 # Implementation notes
 
-The seven entrypoints in `src/servers` load independent catalogs from `src/apps`. They share the MCP registration, schema validation, safe parameter serialization and loopback bridge in `src/core`. New application tools are declared with `tool(name, description, shape, body, readOnly)`; the body must be ES3 and return plain data. Parameters are passed as a JSON literal in `p`, with `h.require`, `h.input` and `h.output` for preconditions. `npm run check` parses every generated script as ES3.
+The seven stable entrypoints in `src/servers` load independent catalogs from `src/apps`. Shared responsibilities have explicit boundaries:
+
+| Directory     | Responsibility                                                                        |
+| ------------- | ------------------------------------------------------------------------------------- |
+| `src/bridge`  | Authenticated loopback queue and safe ExtendScript serialization                      |
+| `src/config`  | Application identifiers, connection validation, repository paths, and package version |
+| `src/mcp`     | MCP server registration, shared tools, reusable schemas, and tool definitions         |
+| `src/setup`   | Validated, repeatable generation of local panels and client configuration             |
+| `src/catalog` | Tool reference generation using the same definitions as the running servers           |
+| `cep`         | Runtime panel assets and the declarative manifest template                            |
+
+New application tools are declared with `tool(name, description, shape, body, readOnly)`; the body must be ES3 and return plain data. Parameters are passed as a JSON literal in `p`, with `h.require`, `h.input` and `h.output` for preconditions. `npm run check` verifies formatting and parses every generated script as ES3. Shared tools are included in both runtime registration and generated documentation; arbitrary scripting is explicitly marked optional in the JSON catalog. `npm run catalog:check` detects stale documentation without rewriting it.
+
+The server and panel version come from `package.json`. Connection files use a strict shared schema, so invalid ports, tokens, application IDs, and attempts to override a panel's host are rejected before setup writes generated files. Error messages do not echo credential values. Setup persists validated tokens before copying panel assets and preserves them on repeated runs. Unit and integration fixtures use disposable directories rather than the user's local connection files.
 
 The official MCP SDK v2 serves modern and legacy MCP clients using its stdio factory. No custom JSON-RPC implementation is maintained here. The HTTP endpoint is an internal CEP transport, not an MCP HTTP endpoint. Multiple client processes must not own the same app bridge port simultaneously.
 

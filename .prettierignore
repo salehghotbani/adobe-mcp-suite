@@ -1,0 +1,5 @@
+node_modules/
+.adobe-mcp/
+build/
+coverage/
+package-lock.json

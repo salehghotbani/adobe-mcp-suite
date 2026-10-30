@@ -42,10 +42,13 @@ Before submitting a pull request:
 npm run check
 npm test
 npm run catalog
+npm run catalog:check
 git diff --check
 ```
 
 Commit changes to `docs/TOOLS.md` and `docs/tools.json` whenever a tool schema or description changes. Generated `.adobe-mcp/`, `build/`, and `node_modules/` files must remain untracked.
+
+Use `npm run format` to apply the shared formatting rules. Keep unit tests in `tests/unit`, integration tests in `tests/integration`, and reusable fixtures in `tests/helpers`. Panel setup belongs in `src/setup`; application metadata and connection validation belong in `src/config`. The public server entrypoints in `src/servers` should remain stable.
 
 Add tests for meaningful behavior changes, especially validation, file handling, connection isolation, serialization, queue ordering, and error recovery. Avoid tests that merely repeat implementation details. For Adobe-facing changes, report the exact application version, platform, workflow exercised, and observed result. Clearly distinguish simulated tests from native host tests.
 

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ExtensionManifest Version="7.0" ExtensionBundleId="com.adobemcp.{{APP}}" ExtensionBundleVersion="{{VERSION}}" ExtensionBundleName="Adobe MCP {{TITLE}}">
+  <ExtensionList>
+    <Extension Id="com.adobemcp.{{APP}}.panel" Version="{{VERSION}}" />
+  </ExtensionList>
+  <ExecutionEnvironment>
+    <HostList><Host Name="{{HOST}}" Version="[0.0,99.9]" /></HostList>
+    <LocaleList><Locale Code="All" /></LocaleList>
+    <RequiredRuntimeList><RequiredRuntime Name="CSXS" Version="10.0" /></RequiredRuntimeList>
+  </ExecutionEnvironment>
+  <DispatchInfoList>
+    <Extension Id="com.adobemcp.{{APP}}.panel">
+      <DispatchInfo>
+        <Resources><MainPath>./index.html</MainPath></Resources>
+        <Lifecycle><AutoVisible>true</AutoVisible></Lifecycle>
+        <UI>
+          <Type>Panel</Type>
+          <Menu>Adobe MCP — {{TITLE}}</Menu>
+          <Geometry>
+            <Size><Height>340</Height><Width>360</Width></Size>
+            <MinSize><Height>270</Height><Width>280</Width></MinSize>
+          </Geometry>
+        </UI>
+      </DispatchInfo>
+    </Extension>
+  </DispatchInfoList>
+</ExtensionManifest>
