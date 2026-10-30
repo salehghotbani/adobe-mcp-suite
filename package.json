@@ -1,6 +1,6 @@
 {
   "name": "adobe-mcp-suite",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "description": "Seven independent local MCP servers for Adobe creative applications",
@@ -17,7 +17,26 @@
   "engines": {
     "node": ">=22"
   },
+  "bin": {
+    "adobe-mcp": "bin/adobe-mcp.mjs"
+  },
+  "files": [
+    "bin",
+    "src",
+    "cep",
+    "assets/branding",
+    "docs",
+    "README.md",
+    "CONTRIBUTING.md",
+    "CHANGELOG.md",
+    "LICENSE",
+    "NOTICE",
+    "SECURITY.md"
+  ],
   "scripts": {
+    "cli": "node bin/adobe-mcp.mjs",
+    "package:release": "node scripts/package-release.mjs",
+    "release:checksums": "node scripts/release-checksums.mjs",
     "setup": "node scripts/setup.mjs",
     "start:premiere": "node src/servers/premiere-pro.mjs",
     "start:photoshop": "node src/servers/photoshop.mjs",
@@ -35,6 +54,7 @@
   },
   "dependencies": {
     "@modelcontextprotocol/server": "^2.4.0",
+    "fflate": "^0.8.3",
     "zod": "^4.0.0"
   },
   "devDependencies": {

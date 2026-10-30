@@ -21,7 +21,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-latest, windows-latest, macos-latest]
         node: [22, 24]
     steps:
       - name: Check out source
@@ -43,12 +43,17 @@ jobs:
         run: npm test
       - name: Verify generated tool documentation
         run: npm run catalog:check
+      - name: Validate POSIX bootstrap
+        if: runner.os != 'Windows'
+        run: sh -n install.sh
       - name: Validate Windows installer and manifests
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
           $parseErrors = $null
           [System.Management.Automation.Language.Parser]::ParseFile((Join-Path $PWD 'scripts/install-cep.ps1'), [ref]$null, [ref]$parseErrors) | Out-Null
+          if ($parseErrors) { throw ($parseErrors | Out-String) }
+          [System.Management.Automation.Language.Parser]::ParseFile((Join-Path $PWD 'install.ps1'), [ref]$null, [ref]$parseErrors) | Out-Null
           if ($parseErrors) { throw ($parseErrors | Out-String) }
           $manifests = @(Get-ChildItem -LiteralPath 'build/cep' -Filter manifest.xml -Recurse)
           if ($manifests.Count -ne 7) { throw 'Expected seven generated manifests.' }

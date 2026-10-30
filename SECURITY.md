@@ -15,6 +15,7 @@ Provide the affected commit or version, platform, reproduction using synthetic d
 - Servers accept MCP commands from the local client that starts them. That client can request document modifications and file exports.
 - The internal HTTP bridge binds to `127.0.0.1` and requires an application-specific token for operational requests. It is not designed for network exposure or multi-user hosting.
 - `.adobe-mcp/config.json`, installed panel `config.js` files, and generated panels contain local credentials. Do not publish them or attach them to issues.
+- Managed installations also store credentials in `<installation home>/connections.json` and CEP panel backups. Keep the home and backup directories private. Removal retains these credentials for reinstalling tools.
 - Token protection does not isolate other software with access to the same operating-system account or files.
 - `run_script` is disabled by default. Enabling `ADOBE_MCP_ALLOW_SCRIPTS=true` grants the client the Adobe host's full ExtendScript capabilities, including native file access.
 - Output existence checks are not an atomic filesystem lock or a filesystem sandbox. Other processes and native render queues can change output files after queueing.
@@ -23,4 +24,8 @@ Provide the affected commit or version, platform, reproduction using synthetic d
 
 ## Unsigned development panels
 
-The installer's `-EnableUnsigned` option explicitly enables unsigned development panels for the current user's CEP 10–12 settings. Only load extension directories you trust. Omit the option when your environment already provides the intended signed or development setup.
+The terminal manager's `--enable-unsigned` option (or the PowerShell bootstrap's `-EnableUnsigned`) explicitly enables unsigned development panels for the current user's CEP 10–12 settings. Only load extension directories you trust. Omit the option when your environment already provides the intended signed or development setup.
+
+## Release downloads and updates
+
+Portable bundles and CEP panels are unsigned. SHA-256 checksums and per-file manifests detect corruption but do not provide independent publisher authentication if the repository or release account is compromised. The manager trusts stable release assets from this repository over HTTPS and validates their paths, sizes, platform and hashes before activation. Automatic checks contact GitHub without credentials and only notify; installation requires the explicit update command. See the [installation guide](docs/INSTALLATION.md) for the check interval, opt-out, rollback and retained bootstrap runtime behavior.

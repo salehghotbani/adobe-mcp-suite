@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="620" height="228" viewBox="0 0 620 228" role="img" aria-labelledby="title description">
+  <title id="title">Seven Adobe applications</title>
+  <desc id="description">Pr Premiere Pro, Ps Photoshop, Me Media Encoder, Ai Illustrator, Id InDesign, Ae After Effects, Au Audition. Independently drawn letter badges identify the supported applications.</desc>
+  <rect width="620" height="228" rx="22" fill="#0c1930"/>
+  <g font-family="Arial, Helvetica, sans-serif">
+    <g transform="translate(20 18)"><rect width="42" height="42" rx="10" fill="#20224d"/><text x="21" y="28" text-anchor="middle" font-size="22" font-weight="bold" fill="#9999ff">Pr</text><text x="54" y="27" font-size="18" fill="#edf5ff">Premiere Pro</text></g>
+    <g transform="translate(324 18)"><rect width="42" height="42" rx="10" fill="#072b48"/><text x="21" y="28" text-anchor="middle" font-size="22" font-weight="bold" fill="#31a8ff">Ps</text><text x="54" y="27" font-size="18" fill="#edf5ff">Photoshop</text></g>
+    <g transform="translate(20 70)"><rect width="42" height="42" rx="10" fill="#20224d"/><text x="21" y="28" text-anchor="middle" font-size="22" font-weight="bold" fill="#9999ff">Me</text><text x="54" y="27" font-size="18" fill="#edf5ff">Media Encoder</text></g>
+    <g transform="translate(324 70)"><rect width="42" height="42" rx="10" fill="#392309"/><text x="21" y="28" text-anchor="middle" font-size="22" font-weight="bold" fill="#ff9a00">Ai</text><text x="54" y="27" font-size="18" fill="#edf5ff">Illustrator</text></g>
+    <g transform="translate(20 122)"><rect width="42" height="42" rx="10" fill="#3d1128"/><text x="21" y="28" text-anchor="middle" font-size="22" font-weight="bold" fill="#ff3366">Id</text><text x="54" y="27" font-size="18" fill="#edf5ff">InDesign</text></g>
+    <g transform="translate(324 122)"><rect width="42" height="42" rx="10" fill="#20224d"/><text x="21" y="28" text-anchor="middle" font-size="22" font-weight="bold" fill="#9999ff">Ae</text><text x="54" y="27" font-size="18" fill="#edf5ff">After Effects</text></g>
+    <g transform="translate(20 174)"><rect width="42" height="38" rx="10" fill="#073a35"/><text x="21" y="27" text-anchor="middle" font-size="22" font-weight="bold" fill="#00e4bb">Au</text><text x="54" y="26" font-size="18" fill="#edf5ff">Audition</text></g>
+    <text x="324" y="199" font-size="13" fill="#95afcb">Independent integration · Adobe MCP Suite</text>
+  </g>
+</svg>

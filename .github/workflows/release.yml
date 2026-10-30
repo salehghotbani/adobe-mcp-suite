@@ -1,0 +1,112 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  pull_request:
+    paths:
+      - 'src/**'
+      - 'bin/**'
+      - 'cep/**'
+      - 'scripts/**'
+      - 'tests/**'
+      - 'package*.json'
+      - 'install.*'
+      - '.github/workflows/release.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  bundle:
+    name: Bundle (${{ matrix.target }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: windows-latest, target: windows-x64, arch: x64 }
+          - { os: macos-15-intel, target: macos-x64, arch: x64 }
+          - { os: macos-latest, target: macos-arm64, arch: arm64 }
+          - { os: ubuntu-latest, target: linux-x64, arch: x64 }
+          - { os: ubuntu-24.04-arm, target: linux-arm64, arch: arm64 }
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24.18.0
+          architecture: ${{ matrix.arch }}
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npm run setup
+      - run: npm run check
+      - run: npm test
+      - run: npm run catalog:check
+      - run: npm run package:release
+      - run: node scripts/smoke-release.mjs
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: bundle-${{ matrix.target }}
+          path: dist/*.zip
+          if-no-files-found: error
+          retention-days: 7
+
+  publish:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: bundle
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24.18.0
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - name: Verify tag matches a version on main
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          node --input-type=module -e 'import {VERSION} from "./src/config/project.mjs"; if(process.env.RELEASE_TAG!==`v${VERSION}`)throw new Error("Tag and package version differ");'
+          git merge-base --is-ancestor HEAD origin/main
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: bundle-*
+          path: dist
+          merge-multiple: true
+      - name: Assemble release assets
+        run: |
+          test "$(find dist -name '*.zip' | wc -l)" -eq 5
+          npm pack --ignore-scripts --pack-destination dist
+          cp install.ps1 install.sh LICENSE NOTICE dist/
+          cp docs/INSTALLATION.md dist/INSTALLATION.md
+          cp docs/RELEASE-NOTES.md dist/RELEASE-NOTES.md
+          npm run release:checksums
+          cd dist
+          sha256sum --check SHA256SUMS
+      - name: Upload complete draft and publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          if gh release view "$RELEASE_TAG" --json isDraft --jq .isDraft > /tmp/release-state; then
+            test "$(cat /tmp/release-state)" = true
+          else
+            gh release create "$RELEASE_TAG" --verify-tag --draft --title "Adobe MCP Suite $RELEASE_TAG" --notes-file docs/RELEASE-NOTES.md
+          fi
+          gh release upload "$RELEASE_TAG" dist/* --clobber
+          gh release edit "$RELEASE_TAG" --draft=false --latest --notes-file docs/RELEASE-NOTES.md

@@ -2,6 +2,7 @@
 
 <p align="center">
   <img src="assets/branding/adobe-mcp-icon.png" width="180" alt="Blue pen nib and connection nodes on a navy app tile">
+  <img src="assets/branding/applications.svg" width="490" alt="Pr Premiere Pro, Ps Photoshop, Me Media Encoder, Ai Illustrator, Id InDesign, Ae After Effects, Au Audition">
 </p>
 
 Seven independent [Model Context Protocol](https://modelcontextprotocol.io/) servers for Adobe creative applications. Each server has its own tool catalog, authenticated loopback bridge, and CEP panel. Connect only the applications you need.
@@ -30,14 +31,46 @@ See the [tool catalog](docs/TOOLS.md), [input schemas](docs/tools.json), [MCP re
 
 ## Requirements
 
-- Node.js 22 or newer, with npm.
+- A matching [portable release](https://github.com/salehghotbani/adobe-mcp-suite/releases/latest), including Node.js and production dependencies. Source development requires Node.js 22+ and npm.
 - An Adobe application that supports CEP 10 or newer and the relevant ExtendScript APIs.
 - An MCP client supporting local stdio servers.
-- Windows for the included panel installer. macOS installation is manual and has not been verified.
+- Windows x64 or macOS Intel/Apple Silicon for native panels. Linux x64/ARM64 supports server-only installation and protocol discovery; native Adobe desktop hosts are unavailable on Linux.
 
 Adobe is transitioning extensions to UXP. Check [Adobe's migration guidance](https://helpx.adobe.com/au/creative-cloud/apps/integration-with-other-apps/manage-plugins/cep-uxp-plugin-transition.html) and your installed application's extension support. The broad host version range in the generated manifests is a loading rule, not a compatibility certification.
 
-## Quick start on Windows
+## Terminal installer
+
+Download the matching ZIP from [Releases](https://github.com/salehghotbani/adobe-mcp-suite/releases/latest), verify its SHA-256 checksum with `SHA256SUMS`, and extract it. No global Node.js/npm installation is required.
+
+```powershell
+# Windows: inside the extracted bundle
+.\adobe-mcp.cmd install --apps premiere,photoshop --enable-unsigned
+```
+
+```sh
+# macOS: inside the extracted bundle
+chmod +x ./adobe-mcp ./runtime/node
+./adobe-mcp install --apps ps,ai --enable-unsigned
+# Linux: use --server-only in place of --enable-unsigned
+```
+
+Omit `--apps` for an interactive selection, or use `--apps all`. The installer prints the stable launcher path and the MCP client configuration file. Add the reported `bin` directory to PATH and import `mcp-servers.json` into your MCP client. Restart Adobe and open the selected CEP panels. The explicit `--enable-unsigned` option enables current-user development panel loading.
+
+```sh
+adobe-mcp install --apps ae,au    # Add tool sets; preserve existing selections
+adobe-mcp config                 # Print selected MCP client entries
+adobe-mcp doctor                 # Verify installation files and settings
+adobe-mcp updates check
+adobe-mcp update
+adobe-mcp rollback
+adobe-mcp uninstall --apps ps
+```
+
+Automatic update checks run in the background while a managed MCP server is running, using a shared 24-hour cache. They notify through stderr; `update` installs a release explicitly after checksum and bundle verification. Selections and bridge tokens survive updates. Use `adobe-mcp updates off` to disable checks, or `updates interval --hours 48` to change the interval.
+
+See the complete [installation, platform, update and rollback guide](docs/INSTALLATION.md) for bootstrap scripts, custom locations, offline use, backups, retained runtimes and unsigned panel settings. Release assets include five portable ZIPs, optional PowerShell/POSIX bootstrap installers, source/npm packaging, checksums and license notices.
+
+## Source checkout on Windows (development)
 
 ### 1. Install dependencies and prepare the panels
 
@@ -157,7 +190,7 @@ npm run catalog:check
 
 `check` verifies consistent formatting, validates JavaScript syntax, checks for duplicate tool names, and parses every generated host script as ES3. Use `npm run format` to format source files. `catalog:check` verifies generated documentation without modifying files. Tests cover real MCP stdio connections for all seven servers, catalog isolation, schemas, configuration validation, repeatable panel setup, authenticated HTTP transport, queue ordering, deadlines, Unicode, file checks, and the actual panel code running against a simulated Adobe host. Loopback HTTP must be allowed by the test environment.
 
-GitHub Actions runs the checks on Windows and Linux with Node.js 22 and 24. These checks do not replace native Adobe integration testing.
+GitHub Actions runs the checks on Windows, macOS and Linux with Node.js 22 and 24. Release bundles also pass native-runner installation and MCP stdio smoke tests on all five targets. These checks do not replace native Adobe integration testing.
 
 Read [CONTRIBUTING.md](CONTRIBUTING.md) for the workflow and validation expectations. The [changelog](CHANGELOG.md) records release changes.
 
