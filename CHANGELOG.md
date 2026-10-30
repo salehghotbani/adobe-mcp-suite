@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.1 — 2026-10-30
+
+- Read downloaded checksum files explicitly as UTF-8 in the PowerShell bootstrap, supporting GitHub's binary asset response type.
+- Add an offline PowerShell regression test for binary checksum responses and forwarding selected apps and paths with spaces.
+
 ## 0.2.0 — 2026-10-30
 
 - Add a terminal manager with selectable installation, incremental app selection, removal, configuration export, diagnostics, verified updates and rollback.

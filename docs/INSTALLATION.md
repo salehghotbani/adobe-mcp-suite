@@ -21,8 +21,8 @@ Host compatibility depends on the installed Adobe version retaining CEP/ExtendSc
 Verify the archive against the release's `SHA256SUMS`, then extract it into a temporary directory. On Windows:
 
 ```powershell
-Get-FileHash .\adobe-mcp-suite-v0.2.0-windows-x64.zip -Algorithm SHA256
-Expand-Archive .\adobe-mcp-suite-v0.2.0-windows-x64.zip .\adobe-mcp-bundle
+Get-FileHash .\adobe-mcp-suite-v0.2.1-windows-x64.zip -Algorithm SHA256
+Expand-Archive .\adobe-mcp-suite-v0.2.1-windows-x64.zip .\adobe-mcp-bundle
 cd adobe-mcp-bundle
 .\adobe-mcp.cmd install --apps photoshop,premiere-pro --enable-unsigned
 ```
