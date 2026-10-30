@@ -6,13 +6,16 @@ import { loadConfig } from '../config/settings.mjs';
 import { Bridge } from '../bridge/http-bridge.mjs';
 import { buildScript } from '../bridge/extendscript.mjs';
 import { commonTools } from './common-tools.mjs';
+import { registerDiscovery } from './discovery.mjs';
 
 export function createMcpServer(app, bridge, tools, allowScripts = false) {
   const server = new McpServer({ name: `adobe-${app}`, version: VERSION });
   const asResult = (value) => ({
     content: [{ type: 'text', text: JSON.stringify(value ?? null, null, 2) }]
   });
-  for (const t of [...commonTools(app, allowScripts), ...tools]) {
+  const registeredTools = [...commonTools(app, allowScripts), ...tools];
+  registerDiscovery(server, { app, bridge, tools: registeredTools, allowScripts });
+  for (const t of registeredTools) {
     server.registerTool(
       t.name,
       { description: t.description, inputSchema: t.schema, annotations: t.annotations },

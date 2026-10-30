@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Add 38 tools across all seven applications, increasing the default total to 131 while preserving existing tool names and inputs.
+- Add per-server catalog and workflow resources, plus workflow-planning and connection-diagnosis prompts.
+- Expand layer/text/image editing, linked-asset inspection, keyframes/effects/markers, sequence ranges/relinking, image-sequence and stitched encoding queues, and Audition command batches.
+- Require explicit replacement for existing composition markers and report partial Audition batch completion without retrying mutations.
+
 - Separate bridge, configuration, MCP, setup, and catalog modules while preserving all seven server entrypoints.
 - Organize tests into unit, integration, and shared fixture directories; consolidate branding and archive earlier designs.
 - Validate saved connection settings before setup writes and avoid exposing credentials in configuration errors.

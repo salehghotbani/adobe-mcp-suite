@@ -17,6 +17,8 @@ The server and panel version come from `package.json`. Connection files use a st
 
 The official MCP SDK v2 serves modern and legacy MCP clients using its stdio factory. No custom JSON-RPC implementation is maintained here. The HTTP endpoint is an internal CEP transport, not an MCP HTTP endpoint. Multiple client processes must not own the same app bridge port simultaneously.
 
+`src/mcp/discovery.mjs` registers two resources and two prompts per server. Resource catalogs are serialized from the instance's registered definitions, so optional scripting is hidden unless enabled. Workflow recipes in `src/mcp/workflows.mjs` are checked against the actual tool names. Resource reads and prompt retrieval do not dispatch native scripts; the diagnosis prompt reads only the local bridge status. See [MCP-DISCOVERY.md](MCP-DISCOVERY.md) for URIs, prompt arguments, and expanded workflows.
+
 The CEP panel calls the native `window.__adobe_cep__` API directly, so it needs no vendored CSInterface library or Node integration. Polls last at most 20 seconds, native evaluation is serialized, and the resulting payload is retained until the bridge acknowledges it. Result delivery can retry; native execution cannot. Another panel cannot take the lease while an operation is in flight. A disconnected poll and a missing native result are distinct cases. Responses from timed-out dispatched jobs release the uncertain state without changing the already-returned MCP error.
 
 Output paths require an existing parent and explicit overwrite for existing files. Save-in-place tools intentionally save the active file. These are checks at invocation/queue time, not a filesystem sandbox or an atomic lock: external processes can create output files afterwards, native dialogs and render queues retain their own behavior, and `run_script` has full host permissions. After Effects templates may alter the output extension, so the resolved module path is checked again when queued. Inspect render targets before executing an existing queue.
@@ -25,6 +27,9 @@ MCP read-only annotations reflect actual tools; mutating tools conservatively ca
 
 ## Sources
 
+- [Adobe's Illustrator JavaScript reference](https://community.adobe.com/havfw69955/attachments/havfw69955/illustrator/426671/1/Illustrator%20JavaScript%20Scripting%20Reference.pdf): ellipse, placement, selection, layer state, and native PDF save options.
+- [Adobe's InDesign Link DOM](https://developer.adobe.com/indesign/uxp/dom/api/l/link/), [Application DOM](https://developer.adobe.com/indesign/uxp/dom/api/a/application/), and [export formats](https://developer.adobe.com/indesign/uxp/dom/api/e/export-format/): shared DOM concepts used by the ExtendScript adapter.
+- [Adobe's Photoshop JavaScript reference](https://community.adobe.com/havfw69955/attachments/havfw69955/photoshop/676396/3/photoshop-javascript-ref-2020-online2pdf-version.pdf): native document and layer methods. UXP APIs are not substituted into ExtendScript scripts.
 - [Official MCP SDK first-server guide](https://github.com/modelcontextprotocol/typescript-sdk/blob/main/docs/get-started/first-server.md): server factories, schemas, tool registration and stdio.
 - [Adobe CEP resources](https://github.com/Adobe-CEP/CEP-Resources): CEP host integration and native scripting bridge.
 - [Adobe Premiere CEP examples](https://github.com/Adobe-CEP/Samples/tree/master/PProPanel): project, sequence, timeline and export scripting patterns.

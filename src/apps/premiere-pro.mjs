@@ -229,5 +229,116 @@ export const tools = [
   h.require(s.exportAsMediaDirect(f.fsName, p.preset, r), 'Export failed.');
   return { path: f.fsName };
 `
+  ),
+  tool(
+    'get_sequence_settings',
+    'Read active sequence video dimensions, timebase, frame duration, playhead and in/out points.',
+    {},
+    sequence +
+      `
+  var settings = s.getSettings();
+  h.require(settings, 'Sequence settings are unavailable.');
+  return {
+    id: s.sequenceID,
+    name: s.name,
+    width: settings.videoFrameWidth,
+    height: settings.videoFrameHeight,
+    timebase: String(s.timebase),
+    frameDurationSeconds: settings.videoFrameRate.seconds,
+    playhead: s.getPlayerPosition().seconds,
+    inPoint: s.getInPointAsTime().seconds,
+    outPoint: s.getOutPointAsTime().seconds
+  };
+`,
+    true
+  ),
+  tool(
+    'list_markers',
+    'Read a paginated list of active sequence markers, including GUIDs and start/end times in seconds.',
+    pageSize,
+    sequence +
+      `
+  var markers = s.markers,
+    marker = markers.getFirstMarker(),
+    items = [],
+    count = 0;
+  while (marker) {
+    if (count >= p.offset && items.length < p.limit)
+      items.push({
+        guid: String(marker.guid),
+        name: marker.name,
+        comments: marker.comments,
+        start: marker.start.seconds,
+        end: marker.end.seconds
+      });
+    count++;
+    marker = markers.getNextMarker(marker);
+  }
+  return { total: count, markers: items };
+`,
+    true
+  ),
+  tool(
+    'set_playhead',
+    'Move the active sequence playhead to an absolute time in seconds.',
+    { seconds: z.number().min(0) },
+    sequence +
+      `
+  var time = new Time();
+  time.seconds = p.seconds;
+  var result = s.setPlayerPosition(time.ticks);
+  h.require(result !== false, 'Could not move the sequence playhead.');
+  return { seconds: s.getPlayerPosition().seconds };
+`
+  ),
+  tool(
+    'set_sequence_range',
+    'Set active sequence in/out points in seconds; end must be greater than start.',
+    { start: z.number().min(0), end: z.number().positive() },
+    sequence +
+      `
+  h.require(p.end > p.start, 'Range end must be greater than start.');
+  s.setOutPoint(Math.max(s.getOutPointAsTime().seconds, p.end));
+  s.setInPoint(p.start);
+  s.setOutPoint(p.end);
+  return { start: s.getInPointAsTime().seconds, end: s.getOutPointAsTime().seconds };
+`
+  ),
+  tool(
+    'set_clip_enabled',
+    'Enable or disable a timeline clip. Track and clip indexes start at zero; requires TrackItem.disabled support.',
+    {
+      kind: z.enum(['video', 'audio']).default('video'),
+      trackIndex: z.number().int().min(0),
+      clipIndex: z.number().int().min(0),
+      enabled: z.boolean()
+    },
+    sequence +
+      `
+  var tracks = p.kind === 'video' ? s.videoTracks : s.audioTracks;
+  h.require(p.trackIndex < tracks.numTracks, 'Track index not found.');
+  var clips = tracks[p.trackIndex].clips;
+  h.require(p.clipIndex < clips.numItems, 'Clip index not found.');
+  var clip = clips[p.clipIndex];
+  h.require(typeof clip.disabled === 'boolean', 'This host does not expose TrackItem.disabled.');
+  clip.disabled = !p.enabled;
+  return { name: clip.name, enabled: !clip.disabled };
+`
+  ),
+  tool(
+    'relink_media',
+    'Replace a project item source file by node ID. All clips referencing that item are affected.',
+    { nodeId: text, path: filePath },
+    project +
+      findItem +
+      `
+  var source = h.input(p.path),
+    item = find(app.project.rootItem, p.nodeId);
+  h.require(item, 'Project item not found.');
+  h.require(item.canChangeMediaPath(), 'This project item cannot be relinked.');
+  var result = item.changeMediaPath(source.fsName, true);
+  h.require(result === 0, 'Media relink failed: ' + result);
+  return { nodeId: p.nodeId, path: item.getMediaPath() };
+`
   )
 ];
