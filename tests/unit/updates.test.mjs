@@ -9,10 +9,21 @@ import {
   checkForUpdates,
   download,
   latestRelease,
+  releaseDownloadTimeout,
   updateInstallation
 } from '../../src/installer/updates.mjs';
 import { atomicWrite, readState } from '../../src/installer/storage.mjs';
 import { fixtureBundle, workspace } from '../helpers/installer-fixture.mjs';
+
+test('release download deadline supports slower connections and rejects invalid overrides', () => {
+  assert.equal(releaseDownloadTimeout({}), 600000);
+  assert.equal(releaseDownloadTimeout({ ADOBE_MCP_DOWNLOAD_TIMEOUT_MS: '900000' }), 900000);
+  for (const value of ['0', '999', '3600001', 'NaN', '1.5'])
+    assert.throws(
+      () => releaseDownloadTimeout({ ADOBE_MCP_DOWNLOAD_TIMEOUT_MS: value }),
+      /integer from/
+    );
+});
 
 function responses(
   version,
@@ -130,6 +141,17 @@ test('verified update activates a new version while preserving tokens; integrity
   await assert.rejects(
     updateInstallation(home, responses('0.3.0', archive, { corruptArchive: true })),
     /Downloaded release checksum mismatch/
+  );
+  assert.equal((await readState(home)).currentVersion, '0.2.0');
+  const timed = responses('0.3.0', archive);
+  await assert.rejects(
+    updateInstallation(home, {
+      fetchImpl: async (url, options) => {
+        if (url.endsWith('.zip')) throw new DOMException('deadline', 'TimeoutError');
+        return timed.fetchImpl(url, options);
+      }
+    }),
+    /Increase ADOBE_MCP_DOWNLOAD_TIMEOUT_MS/
   );
   assert.equal((await readState(home)).currentVersion, '0.2.0');
   assert.equal((await updateInstallation(home, responses('0.3.0', archive))).updated, true);

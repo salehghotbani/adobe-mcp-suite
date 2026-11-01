@@ -1,6 +1,6 @@
 {
   "name": "adobe-mcp-suite",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "private": true,
   "type": "module",
   "description": "Seven independent local MCP servers for Adobe creative applications",

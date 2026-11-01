@@ -68,6 +68,8 @@ If diagnostics report duplicate ports, stop affected MCP servers, assign distinc
 
 ## A download or bundle fails verification
 
+If a bundle download reaches its deadline, use `ADOBE_MCP_DOWNLOAD_TIMEOUT_MS` with a v0.3.1+ manager to allow more time (up to one hour). Older managers cannot read this setting: download a current verified ZIP and run its `install --root <existing-home> --apps <selected-IDs>` command instead. Download failures preserve the active version and settings.
+
 Use `update` again after confirming the network and the intended release. It checks `SHA256SUMS`, the GitHub asset digest when supplied, the archive version/platform and every bundled file before activation. Do not bypass a checksum failure or edit the per-file manifest. Discard a corrupt download and obtain a fresh matching ZIP.
 
 The Windows bootstrap checksum-response issue in v0.2.0 is fixed in v0.2.1. Download the current `install.ps1`, or install from the current platform ZIP. Existing v0.2.0 managed installations can use `adobe-mcp update`.

@@ -90,6 +90,10 @@ For a direct source setup, edit `.adobe-mcp/config.json`, run `npm run setup`, a
 
 Connection files accept only known application IDs with `port` and `token` fields. Do not add host IDs, titles, comments or trailing commas. Token rotation updates active panels; older panel backups can retain previous credentials and should remain private.
 
+## Manual update downloads
+
+Manual `update` also accepts the terminal environment variable `ADOBE_MCP_DOWNLOAD_TIMEOUT_MS`: default `600000` (ten minutes), allowed integer range `1000`–`3600000`. Set it in the terminal invoking the manager, rather than only in a client's individual server entry. Background metadata-check deadlines remain unchanged.
+
 ## Installation metadata
 
 `state.json`, `current`, `versions/`, `bootstrap/` and panel ownership markers are managed by the installer. Use `status`, `doctor`, `repair`, `update`, `rollback` and the `updates` commands to inspect or change installation state. Editing bundled application files causes integrity verification to fail. Use a source checkout for development.

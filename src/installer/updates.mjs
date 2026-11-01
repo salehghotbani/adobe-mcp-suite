@@ -15,6 +15,13 @@ const allowedHosts = new Set([
   'objects.githubusercontent.com'
 ]);
 
+export function releaseDownloadTimeout(env = process.env) {
+  const timeout = Number(env.ADOBE_MCP_DOWNLOAD_TIMEOUT_MS ?? 600000);
+  if (!Number.isInteger(timeout) || timeout < 1000 || timeout > 3600000)
+    throw new Error('ADOBE_MCP_DOWNLOAD_TIMEOUT_MS must be an integer from 1000 through 3600000.');
+  return timeout;
+}
+
 export async function download(
   url,
   { fetchImpl = fetch, maxBytes = 160 * 1024 * 1024, timeoutMs = 120000, signal } = {}
@@ -178,13 +185,18 @@ export function startUpdateMonitor(
 }
 
 export async function updateInstallation(home, { fetchImpl = fetch } = {}) {
+  const downloadTimeoutMs = releaseDownloadTimeout();
   const state = await readState(home);
   if (!state.currentVersion) throw new Error('Install at least one tool before updating.');
   const release = await latestRelease({ fetchImpl });
   if (compareVersions(release.version, state.currentVersion) <= 0)
     return { updated: false, version: state.currentVersion };
   const checksumText = (
-    await download(release.checksums.browser_download_url, { fetchImpl, maxBytes: 1024 * 1024 })
+    await download(release.checksums.browser_download_url, {
+      fetchImpl,
+      maxBytes: 1024 * 1024,
+      timeoutMs: 10000
+    })
   ).toString('utf8');
   const matches = checksumText
     .split(/\r?\n/)
@@ -194,7 +206,19 @@ export async function updateInstallation(home, { fetchImpl = fetch } = {}) {
   const expected = matches[0][1].toLowerCase();
   if (release.asset.digest && release.asset.digest !== `sha256:${expected}`)
     throw new Error('GitHub asset digest does not match SHA256SUMS.');
-  const data = await download(release.asset.browser_download_url, { fetchImpl });
+  let data;
+  try {
+    data = await download(release.asset.browser_download_url, {
+      fetchImpl,
+      timeoutMs: downloadTimeoutMs
+    });
+  } catch (error) {
+    if (error.name === 'TimeoutError' || error.name === 'AbortError')
+      throw new Error(
+        'Release download timed out; the installation was not changed. Increase ADOBE_MCP_DOWNLOAD_TIMEOUT_MS (up to 3600000), or install a downloaded portable ZIP into this home.'
+      );
+    throw error;
+  }
   if (sha256(data) !== expected)
     throw new Error('Downloaded release checksum mismatch; the installation was not changed.');
   const temporary = await mkdtemp(path.join(os.tmpdir(), 'adobe-mcp-update-'));
