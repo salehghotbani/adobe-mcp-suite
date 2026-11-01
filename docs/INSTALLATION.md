@@ -23,10 +23,10 @@ Host compatibility depends on the installed Adobe version retaining CEP/ExtendSc
 Verify the archive against the release's `SHA256SUMS`, then extract it into a temporary directory. On Windows:
 
 ```powershell
-Get-FileHash .\adobe-mcp-suite-v0.3.0-windows-x64.zip -Algorithm SHA256
+Get-FileHash .\adobe-mcp-suite-v0.3.1-windows-x64.zip -Algorithm SHA256
 Get-Content .\SHA256SUMS
 # Compare the hash with the entry for this exact ZIP before extracting.
-Expand-Archive .\adobe-mcp-suite-v0.3.0-windows-x64.zip .\adobe-mcp-bundle
+Expand-Archive .\adobe-mcp-suite-v0.3.1-windows-x64.zip .\adobe-mcp-bundle
 cd adobe-mcp-bundle
 .\adobe-mcp.cmd install --apps photoshop,premiere-pro --enable-unsigned
 ```
@@ -115,6 +115,10 @@ Checks contact the public GitHub releases API without credentials. Only the curr
 `update` fetches only a newer stable release from this repository. It verifies the ZIP against `SHA256SUMS` and the GitHub asset digest when supplied, validates every bundled file, and then activates a version directory. It preserves app selections, connection tokens and update preferences. Existing panels are backed up under `<CEP directory>/.adobe-mcp-backups/`. If activation fails, the previous pointer, configuration and panels are restored. Downloads and extraction have size limits and reject path traversal. Updates require network access; downloaded portable ZIP installation works offline.
 
 Restart Adobe and reconnect MCP servers after updating or rolling back. Already running processes continue using their version until restarted. `rollback` switches to the previously active verified version and regenerates panels using current selections and credentials. Old versions are retained because Windows may still be running their executables. The small bootstrap Node runtime remains stable for the same reason; the MCP server runtime comes from the active version. To replace the bootstrap runtime, close every managed server, back up credentials, and reinstall into a new dedicated home from a fresh bundle.
+
+Manual bundle downloads have a ten-minute deadline in v0.3.1+. Set `ADOBE_MCP_DOWNLOAD_TIMEOUT_MS` in the terminal running `update` to an integer from `1000` through `3600000` milliseconds when needed. This does not change the short metadata/background-check deadlines. For example, `ADOBE_MCP_DOWNLOAD_TIMEOUT_MS=900000 adobe-mcp update` uses fifteen minutes in a POSIX shell; in PowerShell, set `$env:ADOBE_MCP_DOWNLOAD_TIMEOUT_MS = '900000'` before running `adobe-mcp update`.
+
+Older updaters retain their original two-minute download deadline. If one times out on a slow connection, download and verify a current platform ZIP, then run its launcher with `install --root <existing-home> --apps <selected-IDs>`. This upgrades the existing home while preserving its settings. A failed download leaves the active installation unchanged.
 
 ## Diagnostics and repair
 

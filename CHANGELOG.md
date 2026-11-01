@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.1 — 2026-11-01
+
+- Increase manual release bundle downloads from two to ten minutes and allow `ADOBE_MCP_DOWNLOAD_TIMEOUT_MS` overrides from 1000 to 3600000 milliseconds for slow connections.
+- Keep automatic check deadlines unchanged and give a recovery message when bundle downloads time out; the active installation is preserved.
+
 ## 0.3.0 — 2026-11-01
 
 - Add opt-in `doctor --live` checks for authenticated bridge availability, panel connections, wrong ports/credentials and uncertain operations, with bounded read-only requests.
