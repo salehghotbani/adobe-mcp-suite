@@ -81,7 +81,7 @@ For a managed installation:
 
 1. Close the relevant Adobe panels and stop the matching MCP client server processes.
 2. Make a private backup of `<home>/connections.json`.
-3. Edit only the application's `port` and/or `token`. Keep the other applications' entries. Choose a free port and a fresh, unpredictable token satisfying the constraints above.
+3. Edit only the application's `port` and/or `token`. Keep the other applications' entries. Selected apps must have distinct ports. Choose a free port and a fresh, unpredictable token satisfying the constraints above.
 4. Run `adobe-mcp install --apps <app>` through that home's installed launcher. This regenerates selected panels with the saved settings.
 5. Remove stale port/token overrides from the client's environment, or update them to match. Restart Adobe, reopen the panel and reconnect the client.
 6. Call `connection_status`, then `get_app_info` through the MCP client.
@@ -92,6 +92,6 @@ Connection files accept only known application IDs with `port` and `token` field
 
 ## Installation metadata
 
-`state.json`, `current`, `versions/`, `bootstrap/` and panel ownership markers are managed by the installer. Use `status`, `doctor`, `update`, `rollback` and the `updates` commands to inspect or change installation state. Editing bundled application files causes integrity verification to fail. Use a source checkout for development.
+`state.json`, `current`, `versions/`, `bootstrap/` and panel ownership markers are managed by the installer. Use `status`, `doctor`, `repair`, `update`, `rollback` and the `updates` commands to inspect or change installation state. Editing bundled application files causes integrity verification to fail. Use a source checkout for development.
 
 `uninstall --apps <IDs>` and `uninstall --all` retain the home, tokens, version directories and panel backups. Remove discarded entries from the MCP client's own configuration and stop its matching processes. See [removal](INSTALLATION.md#select-applications) and [troubleshooting](TROUBLESHOOTING.md) before manually removing retained files.

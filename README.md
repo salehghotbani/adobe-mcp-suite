@@ -67,11 +67,15 @@ Omit `--apps` for an interactive selection, or use `--apps all`. The installer p
 adobe-mcp install --apps ae,au    # Add tool sets; preserve existing selections
 adobe-mcp config                 # Print selected MCP client entries
 adobe-mcp doctor                 # Verify installation files and settings
+adobe-mcp doctor --live          # Check running bridges and Adobe panel connections
+adobe-mcp repair                 # Rebuild generated files while preserving credentials
 adobe-mcp updates check
 adobe-mcp update
 adobe-mcp rollback
 adobe-mcp uninstall --apps ps
 ```
+
+Use `doctor --live` while the selected MCP servers are running to check the authenticated local bridges. `repair` restores generated launchers, client entries and selected panels from the verified installed version. Close Adobe before repair; it preserves selections and tokens.
 
 Automatic update checks run in the background while a managed MCP server is running, using a shared 24-hour cache. They notify through stderr; `update` installs a release explicitly after checksum and bundle verification. Selections and bridge tokens survive updates. Use `adobe-mcp updates off` to disable checks, or `updates interval --hours 48` to change the interval.
 

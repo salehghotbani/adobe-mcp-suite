@@ -18,11 +18,12 @@ import { execFile as execFileCallback } from 'node:child_process';
 import { APPS } from '../config/applications.mjs';
 import { ROOT } from '../config/paths.mjs';
 import { VERSION } from '../config/project.mjs';
-import { readConfiguration } from '../config/settings.mjs';
-import { writePanel } from '../setup/panels.mjs';
+import { readConfiguration, validateSelectedConnections } from '../config/settings.mjs';
+import { writePanel, panelContents } from '../setup/panels.mjs';
 import { APP_ITEMS, nodeName, verifyBundle, writeBundleManifest } from './bundle.mjs';
 import { PRODUCT, compareVersions, extensionsHome } from './platform.mjs';
 import { runtimeLicense } from './runtime-license.mjs';
+import { probeBridge } from './live-diagnostics.mjs';
 import {
   atomicWrite,
   childPath,
@@ -148,9 +149,9 @@ async function writeLaunchers(home, versionRoot) {
   }
 }
 
-async function ownedPanel(destination, home) {
+async function ownedPanel(destination, home, app) {
   const owner = await readJson(path.join(destination, 'adobe-mcp-owner.json'), null);
-  return owner?.product === PRODUCT && owner.home === path.resolve(home);
+  return owner?.product === PRODUCT && owner.home === path.resolve(home) && owner.app === app;
 }
 
 export async function replacePanels(
@@ -166,7 +167,7 @@ export async function replacePanels(
   await mkdir(extensions, { recursive: true });
   for (const app of state.selectedApps) {
     const target = childPath(extensions, `com.adobemcp.${app}`);
-    if ((await exists(target)) && !(await ownedPanel(target, home)) && !replaceExisting)
+    if ((await exists(target)) && !(await ownedPanel(target, home, app)) && !replaceExisting)
       throw new Error(
         `An unmanaged ${app} panel already exists. Use --replace-existing to back it up explicitly.`
       );
@@ -234,7 +235,7 @@ export function clientConfiguration(home, selectedApps) {
   };
 }
 
-export async function diagnoseInstallation(home) {
+export async function diagnoseInstallation(home, { live = false } = {}) {
   const state = await readState(home),
     checks = [];
   const check = async (name, operation) => {
@@ -251,10 +252,11 @@ export async function diagnoseInstallation(home) {
     if ((await readFile(path.join(home, 'current'), 'utf8')).trim() !== state.currentVersion)
       throw new Error('Active version pointer differs from state.');
   });
+  let settings;
   await check('connection settings', async () => {
-    const settings = await readConfiguration(path.join(home, 'connections.json'));
-    for (const app of state.selectedApps)
-      if (!settings[app]) throw new Error(`Missing connection settings for ${app}.`);
+    const saved = await readConfiguration(path.join(home, 'connections.json'));
+    validateSelectedConnections(saved, state.selectedApps);
+    settings = saved;
   });
   await check('client configuration', async () => {
     const saved = await readJson(path.join(home, 'mcp-servers.json'), null);
@@ -266,9 +268,33 @@ export async function diagnoseInstallation(home) {
   if (!state.serverOnly)
     for (const app of state.selectedApps)
       await check(`${app} panel`, async () => {
-        if (!(await ownedPanel(childPath(state.extensionsRoot, `com.adobemcp.${app}`), home)))
+        const target = childPath(state.extensionsRoot, `com.adobemcp.${app}`);
+        if (!(await ownedPanel(target, home, app)))
           throw new Error('Panel is missing or owned by another installation.');
+        if (settings && state.currentVersion) {
+          const expected = await panelContents({
+            app,
+            sourceRoot: path.join(home, 'versions', state.currentVersion, 'app'),
+            connection: settings[app],
+            version: state.currentVersion
+          });
+          for (const [name, contents] of Object.entries(expected)) {
+            const actual = await readFile(path.join(target, name)).catch(() => null);
+            if (!actual || !actual.equals(contents))
+              throw new Error(
+                `Panel file ${name} is missing or out of date. Run repair after closing Adobe.`
+              );
+          }
+        }
       });
+  if (live && settings)
+    checks.push(
+      ...(await Promise.all(
+        state.selectedApps.map((app) =>
+          probeBridge(app, settings[app], { serverOnly: state.serverOnly })
+        )
+      ))
+    );
   return { healthy: checks.every((item) => item.ok), checks, nativeAdobeVerified: false };
 }
 
@@ -279,6 +305,7 @@ async function activate(home, state, version, { replaceExisting = false } = {}) 
   for (const app of state.selectedApps)
     if (!connections[app])
       connections[app] = { port: APPS[app].port, token: randomBytes(32).toString('hex') };
+  validateSelectedConnections(connections, state.selectedApps);
   await atomicWrite(path.join(home, 'connections.json'), connections);
   await writeLaunchers(home, versionRoot);
   const undo = await replacePanels(
@@ -385,7 +412,7 @@ export async function uninstallApplications(home, apps) {
       for (const app of apps) {
         const target = childPath(state.extensionsRoot, `com.adobemcp.${app}`);
         if (await exists(target)) {
-          if (!(await ownedPanel(target, home)))
+          if (!(await ownedPanel(target, home, app)))
             throw new Error('Refusing to remove a panel owned by another installation.');
           targets.push({
             target,
@@ -426,6 +453,16 @@ export async function rollbackInstallation(home) {
     const state = await readState(home);
     if (!state.previousVersion) throw new Error('No previous version is available.');
     return activate(home, state, state.previousVersion);
+  });
+}
+
+export async function repairInstallation(home, { replaceExisting = false } = {}) {
+  return withLock(home, '.install.lock', async () => {
+    const state = await readState(home);
+    if (!state.currentVersion) throw new Error('No installed version is available to repair.');
+    const connections = await readConfiguration(path.join(home, 'connections.json'));
+    validateSelectedConnections(connections, state.selectedApps);
+    return activate(home, state, state.currentVersion, { replaceExisting });
   });
 }
 export async function enableUnsigned(platform = process.platform, runner = execFile) {
