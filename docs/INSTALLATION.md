@@ -23,10 +23,10 @@ Host compatibility depends on the installed Adobe version retaining CEP/ExtendSc
 Verify the archive against the release's `SHA256SUMS`, then extract it into a temporary directory. On Windows:
 
 ```powershell
-Get-FileHash .\adobe-mcp-suite-v0.2.1-windows-x64.zip -Algorithm SHA256
+Get-FileHash .\adobe-mcp-suite-v0.3.0-windows-x64.zip -Algorithm SHA256
 Get-Content .\SHA256SUMS
 # Compare the hash with the entry for this exact ZIP before extracting.
-Expand-Archive .\adobe-mcp-suite-v0.2.1-windows-x64.zip .\adobe-mcp-bundle
+Expand-Archive .\adobe-mcp-suite-v0.3.0-windows-x64.zip .\adobe-mcp-bundle
 cd adobe-mcp-bundle
 .\adobe-mcp.cmd install --apps photoshop,premiere-pro --enable-unsigned
 ```
@@ -95,7 +95,7 @@ adobe-mcp uninstall --all           # Removes all selected tool sets
 
 Removal retains credentials, the manager, backups and downloaded versions so you can reinstall or roll back. Existing unmanaged panels are refused unless `--replace-existing` is explicitly provided; they are backed up first. Close Adobe before replacing or removing panels. Do not use the older source-only PowerShell installer to overwrite panels managed by this CLI.
 
-Changing panel directory or switching between panel and server-only mode requires removing all selected tools first. Multiple homes must use separate ports and CEP directories; default ports are shared, so one managed home is recommended.
+Changing panel directory or switching between panel and server-only mode requires removing all selected tools first. On Windows/macOS, return to native mode with `install --with-panels --apps <IDs>` after removal; use `--server-only` for the other direction. Multiple homes must use separate ports and CEP directories; default ports are shared, so one managed home is recommended.
 
 ## Updates and rollback
 
@@ -116,10 +116,22 @@ Checks contact the public GitHub releases API without credentials. Only the curr
 
 Restart Adobe and reconnect MCP servers after updating or rolling back. Already running processes continue using their version until restarted. `rollback` switches to the previously active verified version and regenerates panels using current selections and credentials. Old versions are retained because Windows may still be running their executables. The small bootstrap Node runtime remains stable for the same reason; the MCP server runtime comes from the active version. To replace the bootstrap runtime, close every managed server, back up credentials, and reinstall into a new dedicated home from a fresh bundle.
 
+## Diagnostics and repair
+
+```sh
+adobe-mcp doctor
+adobe-mcp doctor --live
+adobe-mcp repair
+```
+
+Default diagnostics verify local installation data, detect duplicate selected ports and compare selected panel files with the verified version and saved settings. `--live` probes running selected bridges through authenticated loopback status requests; it does not start them or execute native commands. Native mode also requires connected panels; server-only mode accepts a reachable bridge. Probes use the saved ports/tokens and fail after two seconds.
+
+Close Adobe before `repair`. It restores generated launchers, the active pointer, client configuration and selected owned panels using the verified installed bundle. Credentials, selections, update preferences and rollback history are preserved. Foreign-owned panels require explicit `--replace-existing`. Damaged versioned bundles or invalid/missing saved credentials must be restored separately. Repair does not change unsigned-panel preferences.
+
 ## Source installation and troubleshooting
 
 Developers can use Node.js 22+ and `npm ci`, then `node bin/adobe-mcp.mjs install --apps ps --server-only`. Source installation copies the current runtime and dependencies and may fetch its matching license from the official Node.js repository if the local distribution omits it. Portable releases include all required licenses and production dependencies. The `.tgz` release asset is source-oriented and requires Node.js/npm; it is not a self-contained runtime bundle.
 
-`status` reports installation metadata. `doctor` verifies the active bundle, version pointer, configuration, bootstrap file presence and selected panel ownership. It does not probe Adobe or the live bridge. If the CEP panel is missing, check unsigned panel settings and the installed host's CEP support. If the bridge port is occupied, stop duplicate servers or follow the [saved port/token change procedure](CONFIGURATION.md#change-a-saved-port-or-rotate-a-token). Connection files contain tokens and must remain private. Same-version installation reuses its version directory; see [verification recovery](TROUBLESHOOTING.md#a-download-or-bundle-fails-verification) for damaged bundles.
+`status` reports installation metadata. Default `doctor` verifies local files and configuration; `doctor --live` also probes running bridges as described above. If the CEP panel is missing, check unsigned panel settings and the installed host's CEP support. If the bridge port is occupied, stop duplicate servers or follow the [saved port/token change procedure](CONFIGURATION.md#change-a-saved-port-or-rotate-a-token). Connection files contain tokens and must remain private. Same-version installation reuses its version directory; see [verification recovery](TROUBLESHOOTING.md#a-download-or-bundle-fails-verification) for damaged bundles.
 
 The installation lock prevents concurrent changes. A lock older than five minutes is recovered only if its process no longer exists. An invalid or busy lock should be inspected after closing all manager processes. Restore damaged state from a backup rather than deleting files while a server is running.

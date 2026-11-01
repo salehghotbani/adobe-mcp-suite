@@ -58,6 +58,12 @@ Version activation updates the generated client entries, pointer and state using
 
 Rollback activates the previously active verified version using the current selection and connection settings. Running processes continue from their original version until restarted. The stable bootstrap executable is not overwritten during upgrades because Windows can keep it open; the versioned runtime changes with activation. See [runtime replacement guidance](INSTALLATION.md#updates-and-rollback).
 
+## Diagnostics and generated-file recovery
+
+Panel generation and comparison share `panelContents` in `src/setup/panels.mjs`. Offline diagnostics detect missing/stale panel assets and connection settings, ownership mismatches and duplicate ports among selected apps. `repair` holds the installation lock, validates saved connections and the active bundle, then regenerates launchers and activates that same version without changing selection, credentials, preferences or rollback history. It does not replace corrupted versioned bundles.
+
+Opt-in live diagnostics use `src/installer/live-diagnostics.mjs` to issue only authenticated `GET /v1/status` requests to fixed `127.0.0.1` ports. Requests have a two-second total deadline and a 64 KiB response limit, do not follow redirects, and validate the returned app/port/status shape. Error messages do not echo credentials or untrusted response bodies. Native mode requires a connected panel; server-only mode checks bridge availability. Uncertain execution remains an unhealthy result and never triggers retries or native dispatch.
+
 ## Release integrity and update checks
 
 `src/installer/bundle.mjs` creates and validates per-file manifests. Update downloads are restricted to the repository's fixed HTTPS release paths and trusted GitHub redirect hosts. They have request and size limits. ZIP extraction rejects unsafe paths and limits expanded sizes. Verification checks the archive checksum, optional GitHub digest, platform/architecture, package version and every declared file before activation.

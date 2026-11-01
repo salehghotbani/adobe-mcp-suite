@@ -1,8 +1,8 @@
-import { copyFile, mkdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { APPS } from '../config/applications.mjs';
 
-export async function writePanel({ app, sourceRoot, destination, connection, version }) {
+export async function panelContents({ app, sourceRoot, connection, version }) {
   const info = APPS[app];
   if (!info) throw new Error('Unknown application.');
   const template = await readFile(path.join(sourceRoot, 'cep', 'manifest.xml.template'), 'utf8');
@@ -11,17 +11,25 @@ export async function writePanel({ app, sourceRoot, destination, connection, ver
     if (!Object.hasOwn(values, key)) throw new Error(`Unknown manifest placeholder: ${key}`);
     return values[key];
   });
-  await mkdir(path.join(destination, 'CSXS'), { recursive: true });
+  const files = {
+    'CSXS/manifest.xml': Buffer.from(manifest),
+    'config.js': Buffer.from(
+      `window.ADOBE_MCP = ${JSON.stringify({ ...connection, app, title: info.title, host: info.host })};\n`
+    )
+  };
   for (const file of ['index.html', 'panel.css', 'panel.js'])
-    await copyFile(path.join(sourceRoot, 'cep', file), path.join(destination, file));
-  await copyFile(
-    path.join(sourceRoot, 'assets', 'branding', 'adobe-mcp-icon.png'),
-    path.join(destination, 'icon.png')
+    files[file] = await readFile(path.join(sourceRoot, 'cep', file));
+  files['icon.png'] = await readFile(
+    path.join(sourceRoot, 'assets', 'branding', 'adobe-mcp-icon.png')
   );
-  await writeFile(
-    path.join(destination, 'config.js'),
-    `window.ADOBE_MCP = ${JSON.stringify({ ...connection, app, title: info.title, host: info.host })};\n`,
-    { mode: 0o600 }
-  );
-  await writeFile(path.join(destination, 'CSXS', 'manifest.xml'), manifest);
+  return files;
+}
+
+export async function writePanel(options) {
+  const files = await panelContents(options);
+  for (const [name, contents] of Object.entries(files)) {
+    const file = path.join(options.destination, name);
+    await mkdir(path.dirname(file), { recursive: true });
+    await writeFile(file, contents, { mode: name === 'config.js' ? 0o600 : 0o644 });
+  }
 }

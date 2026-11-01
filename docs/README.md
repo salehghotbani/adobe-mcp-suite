@@ -1,6 +1,6 @@
 # Adobe MCP Suite documentation
 
-This guide covers the terminal manager and seven independent Adobe MCP servers. The current documentation describes the v0.2.1 command set. Documents included in release archives remain snapshots of their release tag; this directory on `main` includes subsequent documentation corrections.
+This guide covers the terminal manager and seven independent Adobe MCP servers. The current documentation describes the v0.3.0 command set. Documents included in release archives remain snapshots of their release tag; this directory on `main` includes subsequent documentation corrections.
 
 ## Start here
 

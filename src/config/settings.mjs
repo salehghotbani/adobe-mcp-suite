@@ -69,3 +69,16 @@ export async function loadConfig(app, { env = process.env, configPath = CONFIG_P
     throw new Error('Invalid timeout (100–3600000 ms).');
   return { app, ...connection, timeoutMs, allowScripts: env.ADOBE_MCP_ALLOW_SCRIPTS === 'true' };
 }
+
+export function validateSelectedConnections(settings, apps) {
+  const ports = new Map();
+  for (const app of apps) {
+    if (!settings[app]) throw new Error(`Missing connection settings for ${app}.`);
+    const connection = validateConnection(settings[app], app);
+    if (ports.has(connection.port))
+      throw new Error(
+        `Port ${connection.port} is shared by ${ports.get(connection.port)} and ${app}. Choose distinct ports for selected applications.`
+      );
+    ports.set(connection.port, app);
+  }
+}

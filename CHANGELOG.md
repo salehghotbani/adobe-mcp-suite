@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.3.0 — 2026-11-01
+
+- Add opt-in `doctor --live` checks for authenticated bridge availability, panel connections, wrong ports/credentials and uncertain operations, with bounded read-only requests.
+- Add `repair` to regenerate launchers, the active pointer, MCP client entries and owned panels from a verified installed bundle while preserving credentials, selections, preferences and rollback history.
+- Detect missing/stale panel files and credentials in offline diagnostics; reject duplicate ports among selected applications before activation.
+- Add `--with-panels` and PowerShell `-WithPanels` to explicitly return from server-only mode on supported platforms.
+- Reject unsupported/incompatible CLI flags and uninstalled explicit removal selections before mutation; correct server-only next-step guidance.
+- Include expanded English command/configuration/recovery documentation and cross-platform portable repair smoke tests.
+
 ## 0.2.1 — 2026-10-30
 
 - Read downloaded checksum files explicitly as UTF-8 in the PowerShell bootstrap, supporting GitHub's binary asset response type.

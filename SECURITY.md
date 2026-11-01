@@ -28,4 +28,6 @@ The terminal manager's `--enable-unsigned` option (or the PowerShell bootstrap's
 
 ## Release downloads and updates
 
+Opt-in `doctor --live` sends saved bridge credentials only in authenticated status requests to fixed loopback addresses. It has bounded response sizes and deadlines, refuses redirects, and does not print raw response bodies or invoke native commands. `repair` requires a verified installed bundle and valid saved connections; replacing a panel owned by another installation requires the explicit replacement flag.
+
 Portable bundles and CEP panels are unsigned. SHA-256 checksums and per-file manifests detect corruption but do not provide independent publisher authentication if the repository or release account is compromised. The manager trusts stable release assets from this repository over HTTPS and validates their paths, sizes, platform and hashes before activation. Automatic checks contact GitHub without credentials and only notify; installation requires the explicit update command. See the [installation guide](docs/INSTALLATION.md) for the check interval, opt-out, rollback and retained bootstrap runtime behavior.

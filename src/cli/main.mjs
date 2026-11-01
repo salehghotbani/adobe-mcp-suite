@@ -12,6 +12,7 @@ import {
   enableUnsigned,
   installApplications,
   rollbackInstallation,
+  repairInstallation,
   sourceInstallation,
   uninstallApplications
 } from '../installer/manager.mjs';
@@ -27,6 +28,8 @@ Usage: adobe-mcp <command> [options]
   uninstall --all               Remove all selected tool sets
   status                       Show installation and platform information
   doctor                       Verify installed files, configuration and panel ownership
+  doctor --live                Also check selected running bridges and panel connections
+  repair                       Rebuild generated launchers, configuration and owned panels
   config                       Print MCP client JSON for the selected tools
   update                       Download, verify and install the latest stable release
   rollback                     Restore the previous installed version
@@ -40,6 +43,8 @@ Options:
   --root <directory>           Dedicated installation home
   --extensions-dir <directory> Override the Windows/macOS CEP directory
   --server-only                Install servers without native Adobe CEP panels
+  --with-panels                Install CEP panels on Windows/macOS
+  --live                       Probe running bridges with doctor (read only)
   --enable-unsigned            Explicitly enable unsigned CEP development panels
   --replace-existing           Back up and replace an unmanaged project panel
   --json                       Machine-readable management output
@@ -49,8 +54,44 @@ Windows and macOS support CEP installation. Linux provides server-only mode.
 Automatic checks notify only; updates are installed only by the update command.
 `;
 
+const commandOptions = {
+  list: [],
+  install: [
+    'apps',
+    'extensions-dir',
+    'server-only',
+    'with-panels',
+    'enable-unsigned',
+    'replace-existing'
+  ],
+  uninstall: ['apps', 'all'],
+  status: [],
+  doctor: ['live'],
+  repair: ['replace-existing'],
+  config: [],
+  update: [],
+  rollback: [],
+  updates: ['hours'],
+  run: []
+};
+
+function selectAvailable(values, available) {
+  const ids = applications(values);
+  const all = values.some((value) =>
+    value.split(',').some((token) => token.trim().toLowerCase() === 'all')
+  );
+  if (!all)
+    for (const id of ids)
+      if (!available.includes(id)) throw new Error(`Application is not installed: ${id}`);
+  const selected = ids.filter((id) => available.includes(id));
+  if (!selected.length)
+    throw new Error('No installed applications are available for this selection.');
+  return selected;
+}
+
 async function choose(values, available = Object.keys(APPS)) {
-  if (values?.length) return applications(values).filter((id) => available.includes(id));
+  if (values?.length) return selectAvailable(values, available);
+  if (!available.length) throw new Error('No applications are installed.');
   if (!stdin.isTTY) throw new Error('Use --apps in a non-interactive terminal.');
   console.error(
     available.map((id, i) => `${i + 1}. [${BADGES[id]}] ${APPS[id].title} (${id})`).join('\n')
@@ -63,7 +104,7 @@ async function choose(values, available = Object.keys(APPS)) {
       const token = value.trim();
       return /^\d+$/.test(token) ? available[Number(token) - 1] || 'invalid-selection' : token;
     });
-    return applications(choices).filter((id) => available.includes(id));
+    return selectAvailable(choices, available);
   } finally {
     input.close();
   }
@@ -78,6 +119,8 @@ export async function main(argv = process.argv.slice(2)) {
       root: { type: 'string' },
       'extensions-dir': { type: 'string' },
       'server-only': { type: 'boolean' },
+      'with-panels': { type: 'boolean' },
+      live: { type: 'boolean' },
       'enable-unsigned': { type: 'boolean' },
       'replace-existing': { type: 'boolean' },
       all: { type: 'boolean' },
@@ -96,9 +139,27 @@ export async function main(argv = process.argv.slice(2)) {
     return;
   }
   const [command, subcommand, ...extra] = positionals;
+  if (!Object.hasOwn(commandOptions, command))
+    throw new Error(`Unknown command: ${command}. Use --help.`);
   if (extra.length) throw new Error('Too many command arguments.');
   if (subcommand && !['run', 'updates'].includes(command))
     throw new Error('Unexpected positional argument. Use --apps to select applications.');
+  const allowed = new Set([
+    'root',
+    ...commandOptions[command],
+    ...(command === 'run' ? [] : ['json'])
+  ]);
+  for (const option of Object.keys(values))
+    if (!allowed.has(option)) throw new Error(`Option --${option} is not supported by ${command}.`);
+  if (values.all && values.apps) throw new Error('Use either --all or --apps for removal.');
+  if (values['server-only'] && values['with-panels'])
+    throw new Error('Choose either --server-only or --with-panels.');
+  if (command === 'updates') {
+    if (!['check', 'on', 'off', 'interval'].includes(subcommand))
+      throw new Error('Use updates check, on, off, or interval --hours N.');
+    if (values.hours !== undefined && subcommand !== 'interval')
+      throw new Error('--hours is only supported by updates interval.');
+  }
   const home = path.resolve(values.root || installHome());
   const emit = (value) => console.log(JSON.stringify(value, null, 2));
   if (command === 'list') {
@@ -122,7 +183,13 @@ export async function main(argv = process.argv.slice(2)) {
     return;
   }
   if (command === 'install') {
-    if (values['enable-unsigned'] && (values['server-only'] || process.platform === 'linux'))
+    const saved = await readState(home, { optional: true });
+    const serverOnly = values['with-panels']
+      ? false
+      : (values['server-only'] ?? saved?.serverOnly ?? process.platform === 'linux');
+    if (!serverOnly && process.platform === 'linux')
+      throw new Error('Native Adobe panels are unavailable on Linux. Use --server-only.');
+    if (values['enable-unsigned'] && serverOnly)
       throw new Error('Unsigned CEP settings require a Windows/macOS panel installation.');
     const apps = await choose(values.apps);
     const source = await sourceInstallation();
@@ -130,7 +197,7 @@ export async function main(argv = process.argv.slice(2)) {
       home,
       apps,
       source,
-      serverOnly: values['server-only'],
+      serverOnly,
       extensionsRoot: values['extensions-dir'],
       replaceExisting: values['replace-existing']
     });
@@ -152,7 +219,9 @@ export async function main(argv = process.argv.slice(2)) {
         process.platform === 'win32' ? 'adobe-mcp.cmd' : 'adobe-mcp'
       ),
       clientConfiguration: path.join(home, 'mcp-servers.json'),
-      next: 'Add the bin directory to PATH, import the MCP client configuration, then restart Adobe and open the matching CEP panels.'
+      next: state.serverOnly
+        ? 'Add the bin directory to PATH, import the MCP client configuration and reconnect the client. Native Adobe panels are not installed in server-only mode.'
+        : 'Add the bin directory to PATH, import the MCP client configuration, then restart Adobe and open the matching CEP panels.'
     });
     return;
   }
@@ -162,9 +231,19 @@ export async function main(argv = process.argv.slice(2)) {
     return;
   }
   if (command === 'doctor') {
-    const result = await diagnoseInstallation(home);
+    const result = await diagnoseInstallation(home, { live: values.live });
     emit(result);
     if (!result.healthy) process.exitCode = 1;
+    return;
+  }
+  if (command === 'repair') {
+    const result = await repairInstallation(home, { replaceExisting: values['replace-existing'] });
+    emit({
+      repaired: true,
+      version: result.currentVersion,
+      applications: result.selectedApps,
+      restartRequired: true
+    });
     return;
   }
   if (command === 'status') {

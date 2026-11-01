@@ -3,6 +3,7 @@ param(
     [string[]]$Apps,
     [string]$Root,
     [switch]$ServerOnly,
+    [switch]$WithPanels,
     [switch]$EnableUnsigned,
     [switch]$ReplaceExisting
 )
@@ -37,6 +38,7 @@ try {
     if ($Apps) { $arguments += @('--apps', ($Apps -join ',')) }
     if ($Root) { $arguments += @('--root', $Root) }
     if ($ServerOnly) { $arguments += '--server-only' }
+    if ($WithPanels) { $arguments += '--with-panels' }
     if ($EnableUnsigned) { $arguments += '--enable-unsigned' }
     if ($ReplaceExisting) { $arguments += '--replace-existing' }
     & (Join-Path $bundle 'runtime/node.exe') @arguments

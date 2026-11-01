@@ -1,6 +1,6 @@
 # Troubleshooting
 
-Start with the installed launcher's `status` and `doctor` commands. Then use `connection_status` in your MCP client to inspect the live application bridge. `doctor` checks local files and configuration; it does not start Adobe, probe native APIs, or certify compatibility.
+Start with the installed launcher's `status` and `doctor` commands. Then use `connection_status` in your MCP client to inspect the live application bridge. Default `doctor` checks local files and configuration. Add `--live` to check selected running bridges using the saved ports and tokens. Neither mode starts Adobe or dispatches native operations; connection checks do not certify workflow compatibility.
 
 ## The terminal cannot find adobe-mcp
 
@@ -34,7 +34,7 @@ For unsigned development panels, explicitly rerun `install --apps <app> --enable
 
 Keep the matching Adobe MCP panel open. Confirm the app ID and panel match the server entry. Compare the saved port and token with any process environment overrides; both panel and server must agree. After changing credentials, regenerate panels using the [configuration workflow](CONFIGURATION.md#change-a-saved-port-or-rotate-a-token).
 
-An `Unauthorized` error points to mismatched credentials. `Wrong Adobe host` indicates the panel is running in the wrong application. `Another Adobe panel is connected` means another live panel owns the lease; close duplicates. A healthy `doctor` result alone does not establish a live connection.
+An `Unauthorized` error points to mismatched credentials. `Wrong Adobe host` indicates the panel is running in the wrong application. `Another Adobe panel is connected` means another live panel owns the lease; close duplicates. A healthy default `doctor` result alone does not establish a live connection. Use `doctor --live` while the selected MCP servers are running; native mode also requires open connected panels.
 
 Once connected, call `get_app_info` on a disposable session. Check tool-specific API availability, document state and version requirements if that call succeeds but another tool fails.
 
@@ -60,13 +60,19 @@ Run `updates check` to bypass the persisted interval and view the result. Automa
 
 Network errors, rate limiting, unavailable release assets or proxy/TLS restrictions can produce `status: unavailable`. Background failures are quiet and cached, including failures during offline use. Manual checks report the error. Background checks never install a release.
 
+## Generated configuration or panels are missing or stale
+
+Close Adobe and run `adobe-mcp repair` through the installed launcher, or a verified portable launcher with `--root <home>` if generated launchers are missing. It rebuilds generated files from the verified active version, preserves credentials/selections and repairs missing or stale owned panel contents. It can restore the active pointer from valid state metadata. It refuses foreign panel ownership unless replacement is explicitly requested.
+
+If diagnostics report duplicate ports, stop affected MCP servers, assign distinct ports in `connections.json`, run `repair` and reconnect the clients/panels. Retained unselected app entries may share a port; selected apps must each use their own. Invalid connection files and damaged versioned bundles are not replaced automatically.
+
 ## A download or bundle fails verification
 
 Use `update` again after confirming the network and the intended release. It checks `SHA256SUMS`, the GitHub asset digest when supplied, the archive version/platform and every bundled file before activation. Do not bypass a checksum failure or edit the per-file manifest. Discard a corrupt download and obtain a fresh matching ZIP.
 
 The Windows bootstrap checksum-response issue in v0.2.0 is fixed in v0.2.1. Download the current `install.ps1`, or install from the current platform ZIP. Existing v0.2.0 managed installations can use `adobe-mcp update`.
 
-If `doctor` reports damaged active bundle files, a same-version `install` reuses the existing version directory and is not an integrity repair. Close all managed processes and install a verified portable bundle into a new dedicated home. Preserve a private backup of connection settings and selections; resolve the old panel ownership explicitly before replacing panels. Avoid editing internal state or deleting a version directory while a process is using it.
+If `doctor` reports damaged active bundle files, both `repair` and same-version `install` require that version to pass integrity checks. Close all managed processes and install a verified portable bundle into a new dedicated home. Preserve a private backup of connection settings and selections; resolve the old panel ownership explicitly before replacing panels. Avoid editing internal state or deleting a version directory while a process is using it.
 
 `rollback` requires a previously active verified version. It keeps current app selections and credentials, and can switch between the two most recently active versions. Reconnect clients and reopen Adobe panels afterwards. Removing a selected tool set does not recreate it during rollback.
 
