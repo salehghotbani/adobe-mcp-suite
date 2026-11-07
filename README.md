@@ -9,7 +9,7 @@ Seven independent [Model Context Protocol](https://modelcontextprotocol.io/) ser
 
 Built with JavaScript and the official MCP SDK. No API key or cloud backend is required.
 
-Start with the [documentation index](docs/README.md), [installation guide](docs/INSTALLATION.md), [terminal command reference](docs/CLI.md), [MCP configuration](docs/CONFIGURATION.md), and [troubleshooting](docs/TROUBLESHOOTING.md).
+Visit the [Adobe MCP Suite website](https://salehghotbani.github.io/adobe-mcp-suite/) for an overview of the seven apps and platform-specific install commands. For more detail, see the [documentation index](docs/README.md), [installation guide](docs/INSTALLATION.md), [terminal command reference](docs/CLI.md), [MCP configuration](docs/CONFIGURATION.md), and [troubleshooting](docs/TROUBLESHOOTING.md).
 
 **Status:** early development. Protocol, transport, validation, and simulated host tests are available. Native workflows have **not yet been verified inside Adobe applications**. This release uses CEP/ExtendScript; a UXP adapter is not included.
 
