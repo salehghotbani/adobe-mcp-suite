@@ -10,9 +10,51 @@
     />
     <meta name="robots" content="index, follow, max-image-preview:large" />
     <meta name="theme-color" content="#ffffff" />
+    <script>
+      (() => {
+        const key = 'adobe-mcp-theme';
+        const system = matchMedia('(prefers-color-scheme: dark)');
+        const root = document.documentElement;
+        const themeColor = document.querySelector('meta[name="theme-color"]');
+        let preference;
+        let toggle;
+
+        try {
+          const saved = localStorage.getItem(key);
+          if (saved === 'light' || saved === 'dark') preference = saved;
+        } catch {
+          // The switch still works for this page if storage is unavailable.
+        }
+
+        function applyTheme() {
+          const dark = preference ? preference === 'dark' : system.matches;
+          root.dataset.theme = dark ? 'dark' : 'light';
+          themeColor.content = dark ? '#101522' : '#ffffff';
+          toggle?.setAttribute('aria-pressed', String(dark));
+        }
+
+        applyTheme();
+        system.addEventListener('change', applyTheme);
+
+        document.addEventListener('DOMContentLoaded', () => {
+          toggle = document.getElementById('theme-toggle');
+          applyTheme();
+          toggle.hidden = false;
+          toggle.addEventListener('click', () => {
+            preference = root.dataset.theme === 'dark' ? 'light' : 'dark';
+            applyTheme();
+            try {
+              localStorage.setItem(key, preference);
+            } catch {
+              // Keep the current page's selection if storage is unavailable.
+            }
+          });
+        });
+      })();
+    </script>
     <link rel="canonical" href="https://adobemcp.ghotbani.ir/" />
     <link rel="icon" href="assets/favicon.png" type="image/png" sizes="96x96" />
-    <link rel="stylesheet" href="assets/site.css" />
+    <link rel="stylesheet" href="assets/site.css?v=2" />
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="en_US" />
     <meta property="og:site_name" content="Adobe MCP Suite" />
@@ -85,10 +127,16 @@
           <a href="#applications">Applications</a>
           <a href="#install">Install</a>
           <a href="https://github.com/salehghotbani/adobe-mcp-suite/tree/main/docs">Docs</a>
+          <a href="https://github.com/salehghotbani/adobe-mcp-suite"
+            >GitHub <span aria-hidden="true">↗</span></a
+          >
         </nav>
-        <a class="nav-source" href="https://github.com/salehghotbani/adobe-mcp-suite"
-          >GitHub <span aria-hidden="true">↗</span></a
-        >
+        <button class="theme-toggle" id="theme-toggle" type="button" aria-pressed="false" hidden>
+          <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M21 14.2A9 9 0 0 1 9.8 3 9.2 9.2 0 1 0 21 14.2Z" />
+          </svg>
+          Dark mode
+        </button>
       </div>
     </header>
 
